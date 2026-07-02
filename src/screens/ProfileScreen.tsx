@@ -152,6 +152,17 @@ export function ProfileScreen({
             <span className="switch__knob" />
           </button>
         </div>
+        <div className="profile__row profile__row--inline">
+          <span>Automatisch vorlesen</span>
+          <button
+            role="switch"
+            aria-checked={settings.autoAudio}
+            className={`switch ${settings.autoAudio ? 'switch--on' : ''}`}
+            onClick={() => set({ autoAudio: !settings.autoAudio })}
+          >
+            <span className="switch__knob" />
+          </button>
+        </div>
       </div>
 
       <div className="card profile__section">

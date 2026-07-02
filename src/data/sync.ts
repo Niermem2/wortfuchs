@@ -25,6 +25,14 @@ export function onSyncState(fn: (s: SyncState) => void) {
 async function syncUp(userId: string) {
   if (!supabase) return
 
+  const cards = await db.cards.where('dirty').equals(1).toArray()
+  if (cards.length) {
+    const rows = cards.map(({ dirty: _d, ...r }) => r)
+    const { error } = await supabase.from('cards').upsert(rows)
+    if (error) throw error
+    await db.cards.bulkPut(cards.map((c) => ({ ...c, dirty: 0 as const })))
+  }
+
   const progress = await db.progress.where('dirty').equals(1).toArray()
   if (progress.length) {
     const rows = progress.map(({ dirty: _d, ...r }) => r)
@@ -73,7 +81,13 @@ async function syncDown(userId: string) {
   await db.transaction('rw', [db.books, db.lessons, db.cards, db.profiles], async () => {
     await db.books.bulkPut(books.data!)
     await db.lessons.bulkPut(lessons.data!)
-    await db.cards.bulkPut(cards.data!)
+    // lokal bearbeitete Karten nicht überschreiben, bis sie hochgeladen sind
+    const dirtyCardIds = new Set(
+      (await db.cards.where('dirty').equals(1).toArray()).map((c) => c.id),
+    )
+    await db.cards.bulkPut(
+      cards.data!.filter((c) => !dirtyCardIds.has(c.id)).map((c) => ({ ...c, dirty: 0 as const })),
+    )
     // eigenes Profil nicht überschreiben, wenn lokal noch ungesynct
     const own = await db.profiles.get(userId)
     const rows = profiles
@@ -82,19 +96,29 @@ async function syncDown(userId: string) {
     await db.profiles.bulkPut(rows)
   })
 
-  // Fortschritt vom Server (z. B. zweites Gerät); lokal Ungesynctes gewinnt
-  const { data: progress, error } = await supabase
-    .from('card_progress')
-    .select()
-    .eq('user_id', userId)
-  if (error) throw error
+  // Fortschritt & Sessions vom Server: eigene Geräte + (per RLS sichtbar)
+  // Familie für Eltern-Dashboard und Wochen-Rangliste. Lokal Ungesynctes gewinnt.
+  const [progress, sessions] = await Promise.all([
+    supabase.from('card_progress').select(),
+    supabase.from('sessions').select(),
+  ])
+  if (progress.error) throw progress.error
+  if (sessions.error) throw sessions.error
   await db.transaction('rw', db.progress, async () => {
-    for (const row of progress!) {
+    for (const row of progress.data!) {
       const local = await db.progress.get([row.user_id, row.card_id])
       if (!local || (!local.dirty && local.updated_at < row.updated_at)) {
         await db.progress.put({ ...row, dirty: 0 })
       }
     }
+  })
+  await db.transaction('rw', db.sessions, async () => {
+    const dirtyIds = new Set(
+      (await db.sessions.where('dirty').equals(1).toArray()).map((s) => s.id),
+    )
+    await db.sessions.bulkPut(
+      sessions.data!.filter((s) => !dirtyIds.has(s.id)).map((s) => ({ ...s, dirty: 0 as const })),
+    )
   })
 
   const { data: settings } = await supabase.from('settings').select().eq('user_id', userId)

@@ -13,12 +13,15 @@ import { CardsScreen } from './screens/CardsScreen'
 import { RankingScreen } from './screens/RankingScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
 import { LoginScreen } from './screens/LoginScreen'
+import { TestPrepScreen } from './screens/TestPrepScreen'
+import { FamilyScreen } from './screens/FamilyScreen'
 
 export default function App() {
   const [userId, setUserId] = useState<string | null>(null)
   const [ready, setReady] = useState(false)
   const [tab, setTab] = useState<Tab>('learn')
-  const [session, setSession] = useState<{ cards: Card[]; pool: Card[] } | null>(null)
+  const [session, setSession] = useState<{ cards: Card[]; pool: Card[]; mode: 'learn' | 'test' } | null>(null)
+  const [testPrepOpen, setTestPrepOpen] = useState(false)
 
   useEffect(() => {
     initAuth().then((p) => {
@@ -62,7 +65,22 @@ export default function App() {
         settings={settings}
         cards={session.cards}
         pool={session.pool}
+        mode={session.mode}
         onClose={() => setSession(null)}
+      />
+    )
+  }
+
+  if (testPrepOpen) {
+    return (
+      <TestPrepScreen
+        profile={profile}
+        settings={settings}
+        onBack={() => setTestPrepOpen(false)}
+        onStart={(cards, pool) => {
+          setTestPrepOpen(false)
+          setSession({ cards, pool, mode: 'test' })
+        }}
       />
     )
   }
@@ -70,14 +88,20 @@ export default function App() {
   return (
     <>
       {tab === 'learn' && (
-        <HomeScreen profile={profile} settings={settings} onStart={(cards, pool) => setSession({ cards, pool })} />
+        <HomeScreen
+          profile={profile}
+          settings={settings}
+          onStart={(cards, pool) => setSession({ cards, pool, mode: 'learn' })}
+          onTestPrep={() => setTestPrepOpen(true)}
+        />
       )}
       {tab === 'cards' && <CardsScreen profile={profile} settings={settings} />}
-      {tab === 'ranking' && <RankingScreen profile={profile} />}
+      {tab === 'ranking' &&
+        (profile.role === 'parent' ? <FamilyScreen /> : <RankingScreen profile={profile} />)}
       {tab === 'profile' && (
         <ProfileScreen profile={profile} settings={settings} onLogout={() => setUserId(null)} />
       )}
-      <BottomNav tab={tab} onChange={setTab} />
+      <BottomNav tab={tab} onChange={setTab} parent={profile.role === 'parent'} />
     </>
   )
 }

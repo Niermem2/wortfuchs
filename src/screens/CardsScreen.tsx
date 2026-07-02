@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import type { Profile, SettingsData } from '../data/types'
+import { ChevronRight } from 'lucide-react'
+import type { Lesson, Profile, SettingsData } from '../data/types'
 import { db } from '../data/db'
 import { updateSettings } from '../data/settings'
+import { LessonScreen } from './LessonScreen'
 import './screens.css'
 
 export function CardsScreen({
@@ -14,6 +16,7 @@ export function CardsScreen({
 }) {
   const books = useLiveQuery(() => db.books.orderBy('sort_order').toArray(), [])
   const [bookId, setBookId] = useState<number | null>(null)
+  const [openLesson, setOpenLesson] = useState<Lesson | null>(null)
   const activeBook = bookId ?? books?.[0]?.id ?? null
 
   const lessons = useLiveQuery(
@@ -34,6 +37,10 @@ export function CardsScreen({
         ? settings.activeLessons.filter((id) => id !== lessonId)
         : [...settings.activeLessons, lessonId],
     })
+  }
+
+  if (openLesson) {
+    return <LessonScreen lesson={openLesson} profile={profile} onBack={() => setOpenLesson(null)} />
   }
 
   if (books && books.length === 0) {
@@ -69,10 +76,13 @@ export function CardsScreen({
           const active = settings.activeLessons.includes(l.id)
           return (
             <div key={l.id} className="cards__lesson card">
-              <div>
-                <h3>{l.name}</h3>
-                <span className="home__sub">{counts?.get(l.id) ?? 0} Karten</span>
-              </div>
+              <button className="cards__lesson-open" onClick={() => setOpenLesson(l)}>
+                <span>
+                  <h3>{l.name}</h3>
+                  <span className="home__sub">{counts?.get(l.id) ?? 0} Karten</span>
+                </span>
+                <ChevronRight size={20} className="cards__chev" />
+              </button>
               <button
                 role="switch"
                 aria-checked={active}

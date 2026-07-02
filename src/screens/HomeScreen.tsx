@@ -2,19 +2,31 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import type { Card, Profile, SettingsData } from '../data/types'
 import { db } from '../data/db'
 import { collectDueCards, levelProgress, MAX_PHASE } from '../learn/srs'
+import { localDay } from '../learn/stats'
 import { Button, LevelRing, StreakPill, XPBadge, ProgressBar } from '../components/ui'
+import { Heatmap } from '../components/Heatmap'
 import './screens.css'
 
 const PHASE_LABELS = ['Neu', 'P1', 'P2', 'P3', 'P4', 'P5', 'Gelernt']
+
+function daysUntil(date: string | null): number | null {
+  if (!date) return null
+  const target = new Date(date)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return Math.max(0, Math.round((target.getTime() - today.getTime()) / 86400000))
+}
 
 export function HomeScreen({
   profile,
   settings,
   onStart,
+  onTestPrep,
 }: {
   profile: Profile
   settings: SettingsData
   onStart: (cards: Card[], pool: Card[]) => void
+  onTestPrep: () => void
 }) {
   const due = useLiveQuery(
     () => collectDueCards(profile.id, settings, Number.MAX_SAFE_INTEGER),
@@ -29,6 +41,40 @@ export function HomeScreen({
     const counts = Array.from({ length: MAX_PHASE + 1 }, () => 0)
     for (const c of cards) counts[byCard.get(c.id) ?? 0]++
     return { counts, total: cards.length }
+  }, [profile.id, settings])
+
+  const activityByDay = useLiveQuery(async () => {
+    const map = new Map<string, number>()
+    const sessions = await db.sessions.where('user_id').equals(profile.id).toArray()
+    for (const s of sessions) {
+      const key = localDay(new Date(s.started_at))
+      map.set(key, (map.get(key) ?? 0) + s.cards_seen)
+    }
+    return map
+  }, [profile.id])
+
+  const upcoming = useLiveQuery(async () => {
+    if (settings.activeLessons.length === 0) return null
+    const cardIds = new Set(
+      (await db.cards.where('lesson_id').anyOf(settings.activeLessons).toArray())
+        .filter((c) => c.active)
+        .map((c) => c.id),
+    )
+    const progress = await db.progress.where('user_id').equals(profile.id).toArray()
+    const today = new Date()
+    const day = (offset: number) => {
+      const d = new Date(today)
+      d.setDate(d.getDate() + offset)
+      return localDay(d)
+    }
+    let tomorrow = 0
+    let week = 0
+    for (const p of progress) {
+      if (!p.due_date || p.phase >= MAX_PHASE || !cardIds.has(p.card_id)) continue
+      if (p.due_date === day(1)) tomorrow++
+      if (p.due_date > day(0) && p.due_date <= day(7)) week++
+    }
+    return { tomorrow, week }
   }, [profile.id, settings])
 
   const learnedToday = useLiveQuery(async () => {
@@ -78,6 +124,25 @@ export function HomeScreen({
         {due?.length ? `Jetzt lernen (${Math.min(due.length, settings.dailyGoal)})` : 'Nichts fällig'}
       </Button>
 
+      {settings.testPrep ? (
+        <button className="card home__testprep" onClick={onTestPrep}>
+          <div>
+            <h3>Testvorbereitung läuft</h3>
+            <p className="home__sub">
+              {settings.testPrep.lessons.length}{' '}
+              {settings.testPrep.lessons.length === 1 ? 'Lektion' : 'Lektionen'}
+              {daysUntil(settings.testPrep.date) !== null &&
+                ` · noch ${daysUntil(settings.testPrep.date)} ${daysUntil(settings.testPrep.date) === 1 ? 'Tag' : 'Tage'}`}
+            </p>
+          </div>
+          <span className="home__testprep-cta">Üben</span>
+        </button>
+      ) : (
+        <Button block variant="secondary" onClick={onTestPrep}>
+          Für einen Test üben
+        </Button>
+      )}
+
       {phaseStats && phaseStats.total > 0 && (
         <div className="card">
           <h3>Dein Fortschritt</h3>
@@ -108,6 +173,33 @@ export function HomeScreen({
         </p>
         <ProgressBar value={learnedToday ?? 0} max={settings.dailyGoal} />
       </div>
+
+      {upcoming && (
+        <div className="card">
+          <h3>Demnächst fällig</h3>
+          <div className="home__upcoming">
+            <span>
+              <b>{due?.length ?? 0}</b> heute
+            </span>
+            <span>
+              <b>{upcoming.tomorrow}</b> morgen
+            </span>
+            <span>
+              <b>{upcoming.week}</b> nächste 7 Tage
+            </span>
+          </div>
+        </div>
+      )}
+
+      {activityByDay && activityByDay.size > 0 && (
+        <div className="card">
+          <h3>Deine Aktivität</h3>
+          <p className="home__sub">Karten pro Tag, letzte 12 Wochen</p>
+          <div className="home__heatmap">
+            <Heatmap byDay={activityByDay} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

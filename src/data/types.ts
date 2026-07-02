@@ -26,6 +26,8 @@ export interface Card {
   is_custom: boolean
   active: boolean
   updated_at: string
+  /** nur lokal: 1 = wartet auf Upload */
+  dirty?: 0 | 1
 }
 
 export interface CardProgress {
@@ -79,6 +81,8 @@ export interface SettingsData {
   /** Wiederholungsabstände in Tagen je Phase (Index 0 = Phase 1) */
   intervals: number[]
   activeLessons: number[]
+  /** Aktive Testvorbereitung (Lektionen + optionales Zieldatum) */
+  testPrep: { lessons: number[]; date: string | null } | null
 }
 
 export interface Settings {
@@ -100,4 +104,5 @@ export const DEFAULT_SETTINGS: SettingsData = {
   dailyGoal: 20,
   intervals: [0, 1, 3, 9, 30, 90],
   activeLessons: [],
+  testPrep: null,
 }

@@ -24,3 +24,7 @@ db.version(1).stores({
   settings: 'user_id',
   meta: 'key',
 })
+
+db.version(2).stores({
+  cards: 'id, lesson_id, updated_at, dirty',
+})
