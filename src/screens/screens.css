@@ -1,0 +1,313 @@
+/* ---- Home ---- */
+
+.home__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home__brand {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--grape);
+}
+
+.home__badges {
+  display: flex;
+  gap: 8px;
+}
+
+.home__hello {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.home__sub {
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.home__phases {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  align-items: flex-end;
+}
+
+.home__phase {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.home__phase-bar {
+  height: 72px;
+  width: 100%;
+  max-width: 28px;
+  background: var(--grape-soft);
+  border-radius: var(--r-chip);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.home__phase-fill {
+  width: 100%;
+  background: var(--grape);
+  border-radius: var(--r-chip) var(--r-chip) 0 0;
+  transition: height 300ms var(--ease);
+}
+
+.home__phase-fill--done {
+  background: var(--mint);
+}
+
+.home__phase-num {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.home__phase-label {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+/* ---- Karten / Lektionen ---- */
+
+.cards__books {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.cards__book {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.cards__book--active {
+  background: var(--grape);
+  border-color: var(--grape);
+  color: #ffffff;
+}
+
+.cards__lessons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cards__lesson {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* ---- Switch ---- */
+
+.switch {
+  width: 52px;
+  height: 32px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+  padding: 3px;
+  transition: background var(--t-fast) var(--ease);
+  flex-shrink: 0;
+}
+
+.switch--on {
+  background: var(--mint);
+}
+
+.switch__knob {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform var(--t-fast) var(--ease);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.switch--on .switch__knob {
+  transform: translateX(20px);
+}
+
+/* ---- Rangliste ---- */
+
+.ranking__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ranking__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ranking__row--me {
+  border: 1.5px solid var(--grape);
+}
+
+.ranking__pos {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--grape-soft);
+  color: var(--grape);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ranking__pos--gold {
+  background: var(--gold);
+  color: var(--gold-deep);
+}
+
+.ranking__name {
+  flex: 1;
+  font-weight: 700;
+}
+
+.ranking__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.ranking__stat svg {
+  color: var(--fox);
+}
+
+.ranking__stat--xp svg {
+  color: var(--gold);
+  fill: var(--gold);
+}
+
+.ranking__self {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ---- Profil ---- */
+
+.profile__section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profile__row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profile__row--inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.profile__input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--r-tile);
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  font-size: 16px;
+  font-weight: 600;
+  appearance: none;
+}
+
+.profile__input:focus {
+  outline: none;
+  border-color: var(--grape);
+}
+
+.profile__mascots,
+.profile__themes {
+  display: flex;
+  gap: 12px;
+}
+
+.profile__mascot {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--r-tile);
+  background: var(--paper);
+  border: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile__mascot--active {
+  border-color: var(--grape);
+  background: var(--grape-soft);
+}
+
+.profile__theme {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  box-shadow: inset 0 0 0 2px var(--card);
+}
+
+.profile__theme--active {
+  border-color: var(--ink);
+}
+
+/* ---- Login ---- */
+
+.login {
+  justify-content: center;
+  min-height: 100dvh;
+  padding-bottom: 40px;
+}
+
+.login__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.login__title {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--grape);
+}
+
+.login__error {
+  color: var(--berry-deep);
+  background: var(--berry-soft);
+  border-radius: var(--r-chip);
+  padding: 10px 12px;
+  font-weight: 600;
+}

@@ -1,0 +1,115 @@
+/* Design-Tokens nach DESIGN.md — Farben nur über diese Variablen verwenden. */
+
+:root {
+  /* Fläche & Text (Light) */
+  --paper: #f4f1fa;
+  --card: #ffffff;
+  --ink: #201a2e;
+  --ink-soft: #6e6880;
+  --line: #e9e4f2;
+
+  /* Marke (Preset „Violett" = Wortfuchs-Default) */
+  --grape: #6b47e8;
+  --grape-deep: #4e2fc0;
+  --grape-soft: #ece6fd;
+
+  /* Semantik — bleibt in allen Themes gleich */
+  --mint: #17c471;
+  --mint-soft: #dbf7e9;
+  --mint-deep: #0b7a46;
+  --berry: #f1476b;
+  --berry-soft: #fde3e9;
+  --berry-deep: #a91f40;
+  --fox: #ff8a3d;
+  --fox-soft: #ffe9d8;
+  --fox-deep: #a34d12;
+  --gold: #ffc531;
+  --gold-soft: #fff3d1;
+  --gold-deep: #8a6200;
+
+  /* Typografie */
+  --font-display: 'Baloo 2', system-ui, -apple-system, sans-serif;
+  --font-ui: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+  /* Radius */
+  --r-chip: 10px;
+  --r-card: 20px;
+  --r-hero: 26px;
+  --r-tile: 14px;
+  --r-pill: 999px;
+
+  /* Elevation */
+  --shadow-card: 0 4px 16px rgba(107, 71, 232, 0.08);
+  --shadow-float: 0 12px 32px rgba(107, 71, 232, 0.16);
+
+  /* Motion */
+  --ease: ease-out;
+  --t-fast: 150ms;
+  --t-med: 200ms;
+}
+
+/* ---- Dark Mode (data-mode wird per JS gesetzt, „auto" folgt dem System) ---- */
+:root[data-mode='dark'] {
+  --paper: #16131f;
+  --card: #211c2e;
+  --ink: #f3f0fa;
+  --ink-soft: #a29cb5;
+  --line: #322b44;
+
+  --grape: #9b7bf5;
+  --grape-deep: #6b47e8;
+  --grape-soft: #2a2140;
+
+  /* Soft-Tints abgedunkelt (~15 % Deckkraft der Vollfarbe) */
+  --mint-soft: color-mix(in srgb, var(--mint) 15%, var(--paper));
+  --mint-deep: #7fe7b6;
+  --berry-soft: color-mix(in srgb, var(--berry) 15%, var(--paper));
+  --berry-deep: #ff9db2;
+  --fox-soft: color-mix(in srgb, var(--fox) 15%, var(--paper));
+  --fox-deep: #ffc49a;
+  --gold-soft: color-mix(in srgb, var(--gold) 15%, var(--paper));
+  --gold-deep: #ffdd8a;
+
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* ---- Theme-Presets: nur die Markenfarbe wechselt, Semantik bleibt ---- */
+:root[data-theme='ocean'] {
+  --grape: #2e7cf6;
+  --grape-deep: #1c56c2;
+  --grape-soft: #e2eefe;
+  --shadow-card: 0 4px 16px rgba(46, 124, 246, 0.08);
+  --shadow-float: 0 12px 32px rgba(46, 124, 246, 0.16);
+}
+:root[data-theme='ocean'][data-mode='dark'] {
+  --grape: #74a9f8;
+  --grape-deep: #2e7cf6;
+  --grape-soft: #1c2540;
+}
+
+:root[data-theme='teal'] {
+  --grape: #0ca6a6;
+  --grape-deep: #087a7d;
+  --grape-soft: #dcf5f4;
+  --shadow-card: 0 4px 16px rgba(12, 166, 166, 0.08);
+  --shadow-float: 0 12px 32px rgba(12, 166, 166, 0.16);
+}
+:root[data-theme='teal'][data-mode='dark'] {
+  --grape: #58cfcc;
+  --grape-deep: #0ca6a6;
+  --grape-soft: #15302f;
+}
+
+:root[data-theme='pink'] {
+  --grape: #cf3fb4;
+  --grape-deep: #9c2586;
+  --grape-soft: #fbe4f6;
+  --shadow-card: 0 4px 16px rgba(207, 63, 180, 0.08);
+  --shadow-float: 0 12px 32px rgba(207, 63, 180, 0.16);
+}
+:root[data-theme='pink'][data-mode='dark'] {
+  --grape: #ec7ad6;
+  --grape-deep: #cf3fb4;
+  --grape-soft: #352031;
+}

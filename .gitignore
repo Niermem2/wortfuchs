@@ -1,0 +1,17 @@
+# Abhängigkeiten & Build
+node_modules/
+dist/
+dev-dist/
+
+# Env / Secrets
+.env
+.env.*
+!.env.example
+
+# Geschützte Inhalte — niemals committen
+*.xlsx
+*.pdf
+seed/
+
+# System
+.DS_Store
