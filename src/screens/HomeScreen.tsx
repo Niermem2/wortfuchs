@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import type { Card, Profile, SettingsData } from '../data/types'
 import { db } from '../data/db'
@@ -22,11 +23,13 @@ export function HomeScreen({
   settings,
   onStart,
   onTestPrep,
+  onVerbs,
 }: {
   profile: Profile
   settings: SettingsData
   onStart: (cards: Card[], pool: Card[]) => void
   onTestPrep: () => void
+  onVerbs: () => void
 }) {
   const due = useLiveQuery(
     () => collectDueCards(profile.id, settings, Number.MAX_SAFE_INTEGER),
@@ -42,6 +45,14 @@ export function HomeScreen({
     for (const c of cards) counts[byCard.get(c.id) ?? 0]++
     return { counts, total: cards.length }
   }, [profile.id, settings])
+
+  // App-Badge (installierte PWA): Anzahl fälliger Karten am Homescreen-Icon
+  useEffect(() => {
+    if (due === undefined || !('setAppBadge' in navigator)) return
+    ;(due.length > 0 ? navigator.setAppBadge(due.length) : navigator.clearAppBadge()).catch(
+      () => {},
+    )
+  }, [due])
 
   const activityByDay = useLiveQuery(async () => {
     const map = new Map<string, number>()
@@ -125,22 +136,32 @@ export function HomeScreen({
       </Button>
 
       {settings.testPrep ? (
-        <button className="card home__testprep" onClick={onTestPrep}>
-          <div>
-            <h3>Testvorbereitung läuft</h3>
-            <p className="home__sub">
-              {settings.testPrep.lessons.length}{' '}
-              {settings.testPrep.lessons.length === 1 ? 'Lektion' : 'Lektionen'}
-              {daysUntil(settings.testPrep.date) !== null &&
-                ` · noch ${daysUntil(settings.testPrep.date)} ${daysUntil(settings.testPrep.date) === 1 ? 'Tag' : 'Tage'}`}
-            </p>
-          </div>
-          <span className="home__testprep-cta">Üben</span>
-        </button>
+        <>
+          <button className="card home__testprep" onClick={onTestPrep}>
+            <div>
+              <h3>Testvorbereitung läuft</h3>
+              <p className="home__sub">
+                {settings.testPrep.lessons.length}{' '}
+                {settings.testPrep.lessons.length === 1 ? 'Lektion' : 'Lektionen'}
+                {daysUntil(settings.testPrep.date) !== null &&
+                  ` · noch ${daysUntil(settings.testPrep.date)} ${daysUntil(settings.testPrep.date) === 1 ? 'Tag' : 'Tage'}`}
+              </p>
+            </div>
+            <span className="home__testprep-cta">Üben</span>
+          </button>
+          <Button block variant="secondary" onClick={onVerbs}>
+            Unregelmäßige Verben
+          </Button>
+        </>
       ) : (
-        <Button block variant="secondary" onClick={onTestPrep}>
-          Für einen Test üben
-        </Button>
+        <div className="home__extras">
+          <Button variant="secondary" onClick={onTestPrep}>
+            Test üben
+          </Button>
+          <Button variant="secondary" onClick={onVerbs}>
+            Verben
+          </Button>
+        </div>
       )}
 
       {phaseStats && phaseStats.total > 0 && (

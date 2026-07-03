@@ -1,5 +1,14 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { Book, Lesson, Card, CardProgress, Session, Profile, Settings } from './types'
+import type {
+  Book,
+  Lesson,
+  Card,
+  CardProgress,
+  Session,
+  Profile,
+  Settings,
+  VerbProgress,
+} from './types'
 
 /* Einzige Datenquelle fürs UI. Supabase wird nur vom Sync-Layer angefasst. */
 
@@ -8,6 +17,7 @@ export const db = new Dexie('wortfuchs') as Dexie & {
   lessons: EntityTable<Lesson, 'id'>
   cards: EntityTable<Card, 'id'>
   progress: Dexie.Table<CardProgress, [string, string]>
+  verbProgress: Dexie.Table<VerbProgress, [string, string]>
   sessions: EntityTable<Session, 'id'>
   profiles: EntityTable<Profile, 'id'>
   settings: EntityTable<Settings, 'user_id'>
@@ -27,4 +37,8 @@ db.version(1).stores({
 
 db.version(2).stores({
   cards: 'id, lesson_id, updated_at, dirty',
+})
+
+db.version(3).stores({
+  verbProgress: '[user_id+verb], user_id, dirty',
 })

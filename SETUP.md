@@ -7,8 +7,9 @@ kostenloses Supabase-Projekt. Einmalige Einrichtung, ca. 15 Minuten.
 ## 1. Supabase-Projekt anlegen
 
 1. Auf [supabase.com](https://supabase.com) registrieren → „New project" (Region: EU/Frankfurt)
-2. **SQL Editor** öffnen → Inhalt von `supabase/migrations/0001_init.sql` einfügen → Run,
-   danach genauso `0002_family_reads_sessions.sql` (jede Migration einmal, in Reihenfolge)
+2. **SQL Editor** öffnen → die Dateien aus `supabase/migrations/` in Reihenfolge
+   ausführen (je einmal einfügen → Run): `0001_init.sql`,
+   `0002_family_reads_sessions.sql`, `0003_verb_progress.sql`
 
 ## 2. Accounts anlegen
 

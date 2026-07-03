@@ -41,6 +41,14 @@ async function syncUp(userId: string) {
     await db.progress.bulkPut(progress.map((p) => ({ ...p, dirty: 0 as const })))
   }
 
+  const verbs = await db.verbProgress.where('dirty').equals(1).toArray()
+  if (verbs.length) {
+    const rows = verbs.map(({ dirty: _d, ...r }) => r)
+    const { error } = await supabase.from('verb_progress').upsert(rows)
+    if (error) throw error
+    await db.verbProgress.bulkPut(verbs.map((v) => ({ ...v, dirty: 0 as const })))
+  }
+
   const sessions = await db.sessions.where('dirty').equals(1).toArray()
   if (sessions.length) {
     const rows = sessions.map(({ dirty: _d, ...r }) => r)
@@ -119,6 +127,17 @@ async function syncDown(userId: string) {
     await db.sessions.bulkPut(
       sessions.data!.filter((s) => !dirtyIds.has(s.id)).map((s) => ({ ...s, dirty: 0 as const })),
     )
+  })
+
+  const { data: verbs, error: verbErr } = await supabase.from('verb_progress').select()
+  if (verbErr) throw verbErr
+  await db.transaction('rw', db.verbProgress, async () => {
+    for (const row of verbs!) {
+      const local = await db.verbProgress.get([row.user_id, row.verb])
+      if (!local || (!local.dirty && local.updated_at < row.updated_at)) {
+        await db.verbProgress.put({ ...row, dirty: 0 })
+      }
+    }
   })
 
   const { data: settings } = await supabase.from('settings').select().eq('user_id', userId)

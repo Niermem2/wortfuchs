@@ -77,6 +77,12 @@
   color: var(--ink-soft);
 }
 
+.home__extras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
 .home__upcoming {
   display: flex;
   gap: 16px;

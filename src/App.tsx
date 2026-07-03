@@ -15,6 +15,7 @@ import { ProfileScreen } from './screens/ProfileScreen'
 import { LoginScreen } from './screens/LoginScreen'
 import { TestPrepScreen } from './screens/TestPrepScreen'
 import { FamilyScreen } from './screens/FamilyScreen'
+import { VerbsScreen } from './screens/VerbsScreen'
 
 export default function App() {
   const [userId, setUserId] = useState<string | null>(null)
@@ -22,6 +23,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('learn')
   const [session, setSession] = useState<{ cards: Card[]; pool: Card[]; mode: 'learn' | 'test' } | null>(null)
   const [testPrepOpen, setTestPrepOpen] = useState(false)
+  const [verbsOpen, setVerbsOpen] = useState(false)
 
   useEffect(() => {
     initAuth().then((p) => {
@@ -71,6 +73,10 @@ export default function App() {
     )
   }
 
+  if (verbsOpen) {
+    return <VerbsScreen profile={profile} settings={settings} onClose={() => setVerbsOpen(false)} />
+  }
+
   if (testPrepOpen) {
     return (
       <TestPrepScreen
@@ -93,6 +99,7 @@ export default function App() {
           settings={settings}
           onStart={(cards, pool) => setSession({ cards, pool, mode: 'learn' })}
           onTestPrep={() => setTestPrepOpen(true)}
+          onVerbs={() => setVerbsOpen(true)}
         />
       )}
       {tab === 'cards' && <CardsScreen profile={profile} settings={settings} />}

@@ -49,7 +49,17 @@ export interface Session {
   cards_seen: number
   cards_correct: number
   xp_earned: number
-  mode: 'learn' | 'test'
+  mode: 'learn' | 'test' | 'verbs'
+  dirty: 0 | 1
+}
+
+export interface VerbProgress {
+  user_id: string
+  verb: string
+  streak: number
+  correct_count: number
+  wrong_count: number
+  updated_at: string
   dirty: 0 | 1
 }
 
