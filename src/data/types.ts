@@ -87,6 +87,9 @@ export interface SettingsData {
   inputMode: InputMode
   typoTolerance: boolean
   autoAudio: boolean
+  /** voiceURI der bevorzugten Englisch-Stimme; null = automatisch (GB bevorzugt) */
+  voiceURI: string | null
+  speechRate: number
   dailyGoal: number
   /** Wiederholungsabstände in Tagen je Phase (Index 0 = Phase 1) */
   intervals: number[]
@@ -111,6 +114,8 @@ export const DEFAULT_SETTINGS: SettingsData = {
   inputMode: 'choice',
   typoTolerance: true,
   autoAudio: false,
+  voiceURI: null,
+  speechRate: 0.95,
   dailyGoal: 20,
   intervals: [0, 1, 3, 9, 30, 90],
   activeLessons: [],

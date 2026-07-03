@@ -5,6 +5,7 @@ import { updateSettings } from '../data/settings'
 import { isLocalMode, signOut } from '../data/auth'
 import { fullSync, getSyncState, onSyncState, type SyncState } from '../data/sync'
 import { levelProgress } from '../learn/srs'
+import { canSpeak, listEnglishVoices, onVoicesChanged, setSpeechPrefs, speak } from '../learn/speech'
 import { Mascot } from '../components/Mascot'
 import { Button, LevelRing } from '../components/ui'
 import './screens.css'
@@ -28,6 +29,9 @@ export function ProfileScreen({
 }) {
   const [sync, setSync] = useState<SyncState>(getSyncState())
   useEffect(() => onSyncState(setSync), [])
+
+  const [voices, setVoices] = useState(() => (canSpeak() ? listEnglishVoices() : []))
+  useEffect(() => onVoicesChanged(() => setVoices(listEnglishVoices())), [])
 
   const set = (patch: Partial<SettingsData>) => updateSettings(profile.id, patch)
 
@@ -152,18 +156,62 @@ export function ProfileScreen({
             <span className="switch__knob" />
           </button>
         </div>
-        <div className="profile__row profile__row--inline">
-          <span>Automatisch vorlesen</span>
-          <button
-            role="switch"
-            aria-checked={settings.autoAudio}
-            className={`switch ${settings.autoAudio ? 'switch--on' : ''}`}
-            onClick={() => set({ autoAudio: !settings.autoAudio })}
-          >
-            <span className="switch__knob" />
-          </button>
-        </div>
       </div>
+
+      {canSpeak() && (
+        <div className="card profile__section">
+          <h3>Audio</h3>
+          <label className="profile__row">
+            <span className="caption">Englische Stimme</span>
+            <select
+              className="profile__input"
+              value={settings.voiceURI ?? ''}
+              onChange={(e) => {
+                const uri = e.target.value || null
+                // Hörprobe sofort mit der neuen Stimme (Settings-Update läuft asynchron)
+                setSpeechPrefs({ voiceURI: uri, rate: settings.speechRate })
+                set({ voiceURI: uri })
+                speak('Hello, nice to meet you.')
+              }}
+            >
+              <option value="">Automatisch (Britisch bevorzugt)</option>
+              {voices.map((v) => (
+                <option key={v.voiceURI} value={v.voiceURI}>
+                  {v.name} · {v.lang}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="profile__row">
+            <span className="caption">Sprechtempo</span>
+            <select
+              className="profile__input"
+              value={String(settings.speechRate)}
+              onChange={(e) => {
+                const rate = Number(e.target.value)
+                setSpeechPrefs({ voiceURI: settings.voiceURI, rate })
+                set({ speechRate: rate })
+                speak('The house is big.')
+              }}
+            >
+              <option value="0.8">Langsam</option>
+              <option value="0.95">Normal</option>
+              <option value="1.1">Schnell</option>
+            </select>
+          </label>
+          <div className="profile__row profile__row--inline">
+            <span>Automatisch vorlesen</span>
+            <button
+              role="switch"
+              aria-checked={settings.autoAudio}
+              className={`switch ${settings.autoAudio ? 'switch--on' : ''}`}
+              onClick={() => set({ autoAudio: !settings.autoAudio })}
+            >
+              <span className="switch__knob" />
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="card profile__section">
         <h3>Daten</h3>

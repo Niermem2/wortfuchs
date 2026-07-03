@@ -1,32 +1,73 @@
-/* Text-to-Speech für englische Wörter und Beispielsätze (Web Speech API).
-   Auf iOS ab Werk verfügbar, funktioniert auch offline mit Systemstimmen. */
+/* Text-to-Speech über die Stimmen des Geräts (Web Speech API).
+   Englisch bevorzugt Britisch (Green Line); Deutsch nimmt die beste de-DE-Stimme.
+   Stimme und Tempo sind pro Profil einstellbar (setSpeechPrefs). */
 
-let voice: SpeechSynthesisVoice | undefined
+let voices: SpeechSynthesisVoice[] = []
+let prefs: { voiceURI: string | null; rate: number } = { voiceURI: null, rate: 0.95 }
+const listeners = new Set<() => void>()
 
-function pickVoice() {
-  const voices = speechSynthesis.getVoices()
-  voice =
-    voices.find((v) => v.lang === 'en-GB' && v.localService) ??
-    voices.find((v) => v.lang === 'en-GB') ??
-    voices.find((v) => v.lang.startsWith('en') && v.localService) ??
-    voices.find((v) => v.lang.startsWith('en'))
+function refreshVoices() {
+  voices = speechSynthesis.getVoices()
+  listeners.forEach((fn) => fn())
 }
 
 if ('speechSynthesis' in window) {
-  pickVoice()
-  speechSynthesis.addEventListener('voiceschanged', pickVoice)
+  refreshVoices()
+  speechSynthesis.addEventListener('voiceschanged', refreshVoices)
 }
 
 export function canSpeak(): boolean {
   return 'speechSynthesis' in window
 }
 
-export function speak(text: string) {
+export function setSpeechPrefs(p: { voiceURI: string | null; rate: number }) {
+  prefs = p
+}
+
+/** Benachrichtigt, wenn das Gerät seine Stimmenliste (asynchron) lädt */
+export function onVoicesChanged(fn: () => void) {
+  listeners.add(fn)
+  return () => {
+    listeners.delete(fn)
+  }
+}
+
+function norm(lang: string) {
+  return lang.replace('_', '-').toLowerCase()
+}
+
+export function listEnglishVoices(): SpeechSynthesisVoice[] {
+  return voices
+    .filter((v) => norm(v.lang).startsWith('en'))
+    .sort((a, b) => a.name.localeCompare(b.name))
+}
+
+function bestVoice(lang: 'en' | 'de'): SpeechSynthesisVoice | undefined {
+  const c = voices.filter((v) => norm(v.lang).startsWith(lang))
+  if (lang === 'en') {
+    const preferred = prefs.voiceURI ? c.find((v) => v.voiceURI === prefs.voiceURI) : undefined
+    if (preferred) return preferred
+    return (
+      c.find((v) => norm(v.lang) === 'en-gb' && v.localService) ??
+      c.find((v) => norm(v.lang) === 'en-gb') ??
+      c.find((v) => v.localService) ??
+      c[0]
+    )
+  }
+  return (
+    c.find((v) => norm(v.lang) === 'de-de' && v.localService) ??
+    c.find((v) => norm(v.lang) === 'de-de') ??
+    c[0]
+  )
+}
+
+export function speak(text: string, lang: 'en' | 'de' = 'en') {
   if (!canSpeak() || !text) return
   speechSynthesis.cancel()
   const utter = new SpeechSynthesisUtterance(text)
-  utter.lang = voice?.lang ?? 'en-GB'
+  const voice = bestVoice(lang)
   if (voice) utter.voice = voice
-  utter.rate = 0.95
+  utter.lang = voice?.lang ?? (lang === 'de' ? 'de-DE' : 'en-GB')
+  utter.rate = prefs.rate
   speechSynthesis.speak(utter)
 }

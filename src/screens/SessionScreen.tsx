@@ -280,8 +280,16 @@ export function SessionScreen({
         <>
           <div className="session__solution card">
             {solution}
-            {item.direction === 'de-en' && canSpeak() && (
-              <button className="btn btn--ghost" onClick={() => speak(item.card.english)} aria-label="Anhören">
+            {canSpeak() && (
+              <button
+                className="btn btn--ghost"
+                onClick={() =>
+                  item.direction === 'de-en'
+                    ? speak(item.card.english)
+                    : speak(item.card.german, 'de')
+                }
+                aria-label="Anhören"
+              >
                 <Volume2 size={20} />
               </button>
             )}
@@ -302,7 +310,11 @@ export function SessionScreen({
             {canSpeak() && (
               <button
                 className="btn btn--ghost session__speak"
-                onClick={() => speak(item.card.example_en ? `${item.card.english}. ${item.card.example_en}` : item.card.english)}
+                onClick={() =>
+                  item.direction === 'de-en'
+                    ? speak(item.card.example_en ? `${item.card.english}. ${item.card.example_en}` : item.card.english)
+                    : speak(item.card.german, 'de')
+                }
                 aria-label="Anhören"
               >
                 <Volume2 size={20} />

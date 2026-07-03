@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS } from './data/types'
 import { initAuth } from './data/auth'
 import { startAutoSync } from './data/sync'
 import { applyBranding } from './theme/presets'
+import { setSpeechPrefs } from './learn/speech'
 import { BottomNav, type Tab } from './components/BottomNav'
 import { HomeScreen } from './screens/HomeScreen'
 import { SessionScreen } from './screens/SessionScreen'
@@ -46,7 +47,10 @@ export default function App() {
   )
 
   useEffect(() => {
-    if (settings) applyBranding(settings.theme, settings.mode, settings.mascot, settings.appName)
+    if (settings) {
+      applyBranding(settings.theme, settings.mode, settings.mascot, settings.appName)
+      setSpeechPrefs({ voiceURI: settings.voiceURI, rate: settings.speechRate })
+    }
   }, [settings])
 
   function handleLogin(p: Profile) {
