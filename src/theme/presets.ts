@@ -57,10 +57,11 @@ export function applyBranding(theme: ThemeId, mode: Mode, mascot: MascotId, appN
   else document.documentElement.dataset.theme = theme
   applyMode()
 
+  const base = import.meta.env.BASE_URL
   document.title = appName
   setMeta('theme-color', THEMES.find((t) => t.id === theme)!.color)
   setMeta('apple-mobile-web-app-title', appName)
-  setLink('apple-touch-icon', `/icons/${mascot}-180.png`)
-  setLink('icon', `/icons/${mascot}-192.png`)
-  setLink('manifest', `/manifests/${mascot}.webmanifest`)
+  setLink('apple-touch-icon', `${base}icons/${mascot}-180.png`)
+  setLink('icon', `${base}icons/${mascot}-192.png`)
+  setLink('manifest', `${base}manifests/${mascot}.webmanifest`)
 }

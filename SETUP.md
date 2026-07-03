@@ -47,17 +47,24 @@ npm run dev
 
 Mit gesetzten `VITE_…`-Variablen erscheint der Login; ohne läuft der Demo-Modus.
 
-## 5. Deployment (kostenlos)
+## 5. Deployment: GitHub Pages (kostenlos)
 
-**Empfehlung Cloudflare Pages** (privates Repo möglich):
-1. Repo zu GitHub pushen (privat reicht)
-2. [pages.cloudflare.com](https://pages.cloudflare.com) → Projekt verbinden
-3. Build command `npm run build`, Output `dist`
-4. Environment Variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+Der Workflow `.github/workflows/deploy.yml` deployt bei jedem Push auf `main`
+automatisch. Der Unterpfad (`/<repo>/`) wird dabei automatisch gesetzt.
+Voraussetzung: **öffentliches** Repo (GitHub-Free) — die Vokabeln sind davon
+nicht betroffen, sie liegen nur in Supabase hinter Login.
 
-**Alternative GitHub Pages** (Repo muss im Free-Plan öffentlich sein):
-zusätzlich in `vite.config.ts` `base: '/<repo-name>/'` setzen und einen
-Actions-Workflow für `npm run build` + Pages-Deploy anlegen.
+1. Öffentliches GitHub-Repo anlegen und pushen
+2. Repo → Settings → **Secrets and variables → Actions** → zwei Secrets anlegen:
+   `VITE_SUPABASE_URL` und `VITE_SUPABASE_ANON_KEY` (Werte wie in `.env`)
+3. Repo → Settings → **Pages** → Source: **GitHub Actions**
+4. Push auf `main` (oder Actions → „Deploy zu GitHub Pages" → Run workflow)
+
+Die App ist dann unter `https://<user>.github.io/<repo>/` erreichbar.
+
+**Alternative Cloudflare Pages** (falls das Repo privat bleiben soll):
+Projekt verbinden, Build `npm run build`, Output `dist`, gleiche Env-Variablen —
+`BASE_PATH` dort **nicht** setzen.
 
 ## 6. Aufs iPhone bringen
 
