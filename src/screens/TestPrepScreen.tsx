@@ -93,7 +93,7 @@ export function TestPrepScreen({
                     onClick={() => toggle(l.id)}
                   >
                     {selected.includes(l.id) && <Check size={14} />}
-                    {l.name}
+                    {l.code}
                   </button>
                 ))}
             </div>

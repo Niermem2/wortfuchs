@@ -31,9 +31,84 @@ interface Row {
   exampleDe: string
 }
 
-async function readRows(): Promise<Row[]> {
+/* Offizielle Abschnittstitel je Band (Quelle: Klett-Produktseiten „Buchaufbau",
+   ISBN 978-3-12-864010-5 / -864020-4 / -864030-3 / -864040-2) */
+const BAND_TITLES: Record<number, Record<string, string>> = {
+  1: {
+    U1: 'A new school',
+    U2: 'At home',
+    U3: 'Our Greenwich',
+    U4: 'Happy Birthday',
+    AC1: 'Across cultures 1: Greenwich: A special corner of London',
+    AC2: 'Across cultures 2: How does it taste?',
+    MS1: 'Media smart: Writing texts on computers',
+  },
+  2: {
+    U1: 'The new boy',
+    U2: 'London: Wow!',
+    U3: 'Star of the internet',
+    U4: "What's your sport?",
+    U5: 'Scotland, here we come!',
+    AC1: 'Across cultures 1: London: A world city',
+    AC2: 'Across cultures 2: Special days in the British Isles',
+    MS1: 'Media smart: Searching for information online',
+  },
+  3: {
+    U1: 'The weekend workshop',
+    U2: 'Welcome to Wales – Croeso i Gymru',
+    U3: 'The Emerald Isle',
+    U4: 'Faces of Britain',
+    AC1: 'Across cultures 1: The British Isles',
+    AC2: 'Across cultures 2: Staying with a host family',
+    MS: 'Media smart: The power of pictures',
+    TS1: 'Text smart 1: Lyrical texts',
+    TS2: 'Text smart 2: Factual texts',
+    TR: 'Trailer: A trip to Dublin',
+  },
+  4: {
+    U1: 'New York City: The Big Apple',
+    U2: 'A new life in New England',
+    U3: 'The Desert Southwest',
+    U4: "California — Pacific 'paradise'?",
+    AC1: 'Across cultures 1: A first look at the USA',
+    AC2: 'Across cultures 2: Schools in the US',
+    AC3: 'Across cultures 3: Indigenous Americans',
+    MS: 'Media smart: The framing effect',
+    TS1: 'Text smart 1: Visual texts',
+    TS2: 'Text smart 2: Fictional texts',
+  },
+}
+
+/** Anzeigename einer Lektion: offizieller Band-Titel, sonst Langname aus dem
+    Blatt „Lektionen", sonst der Code selbst. */
+function lessonName(bookId: number, code: string, sheetNames: Map<string, string>): string {
+  const titles = BAND_TITLES[bookId] ?? {}
+  const unit = code.match(/^(U\d)(?:\s+(.+))?$/)
+  if (!unit && titles[code]) return titles[code]
+  if (unit && titles[unit[1]]) {
+    const sheetName = sheetNames.get(code)
+    // Teil-Bezeichnung („Station 1", „Check-in" …) aus dem Blatt-Langnamen
+    const part = sheetName?.match(/^Unit \d: (.+)$/)?.[1]
+    const base = `Unit ${unit[1].slice(1)}: ${titles[unit[1]]}`
+    return part ? `${base} · ${part}` : base
+  }
+  return sheetNames.get(code) ?? code
+}
+
+async function readRows(): Promise<{ rows: Row[]; lessonNames: Map<string, string> }> {
   const wb = new ExcelJS.Workbook()
   await wb.xlsx.readFile(XLSX_PATH)
+
+  // Blatt „Lektionen": Code → Langname (+ Beschreibung, aktuell ungenutzt)
+  const lessonNames = new Map<string, string>()
+  const namesSheet = wb.getWorksheet('Lektionen') ?? wb.getWorksheet('Tabelle1')
+  namesSheet?.eachRow((row, n) => {
+    if (n === 1) return
+    const code = (row.getCell(1).text ?? '').trim()
+    const name = (row.getCell(2).text ?? '').trim()
+    if (code && name) lessonNames.set(code, name)
+  })
+
   const ws = wb.getWorksheet('Vokabeln') ?? wb.worksheets[0]
   const rows: Row[] = []
   ws.eachRow((row, n) => {
@@ -51,12 +126,12 @@ async function readRows(): Promise<Row[]> {
     if (r.band && r.lesson && r.english && r.german) rows.push(r)
     else if (r.english || r.german) console.warn(`Zeile ${n} übersprungen (unvollständig):`, r)
   })
-  return rows
+  return { rows, lessonNames }
 }
 
 async function main() {
-  const rows = await readRows()
-  console.log(`${rows.length} Vokabeln aus ${XLSX_PATH} gelesen.`)
+  const { rows, lessonNames } = await readRows()
+  console.log(`${rows.length} Vokabeln aus ${XLSX_PATH} gelesen, ${lessonNames.size} Lektionsnamen.`)
 
   const bandNames = [...new Set(rows.map((r) => r.band))].sort()
   const books = bandNames.map((name, i) => ({
@@ -85,7 +160,10 @@ async function main() {
   }
   const { error: lessonErr } = await supabase
     .from('lessons')
-    .upsert(lessonList.map((l) => ({ ...l, name: l.code })), { onConflict: 'book_id,code' })
+    .upsert(
+      lessonList.map((l) => ({ ...l, name: lessonName(l.book_id, l.code, lessonNames) })),
+      { onConflict: 'book_id,code' },
+    )
   if (lessonErr) throw lessonErr
 
   const { data: lessons, error: fetchErr } = await supabase

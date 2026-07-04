@@ -79,7 +79,10 @@ export function CardsScreen({
               <button className="cards__lesson-open" onClick={() => setOpenLesson(l)}>
                 <span>
                   <h3>{l.name}</h3>
-                  <span className="home__sub">{counts?.get(l.id) ?? 0} Karten</span>
+                  <span className="cards__meta">
+                    <span className="cards__code">{l.code}</span>
+                    <span className="home__sub">{counts?.get(l.id) ?? 0} Karten</span>
+                  </span>
                 </span>
                 <ChevronRight size={20} className="cards__chev" />
               </button>

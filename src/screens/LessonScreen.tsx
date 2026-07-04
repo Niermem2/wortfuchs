@@ -148,7 +148,7 @@ export function LessonScreen({
         <div className="lesson__title">
           <h1>{lesson.name}</h1>
           <span className="home__sub">
-            {collected}/{cards?.length ?? 0} gesammelt{gold > 0 && ` · ${gold} in Gold`}
+            {lesson.code} · {collected}/{cards?.length ?? 0} gesammelt{gold > 0 && ` · ${gold} in Gold`}
           </span>
         </div>
         <button className="btn btn--ghost" onClick={() => setModal({ card: null })} aria-label="Neue Karte">

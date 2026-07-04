@@ -176,6 +176,25 @@
   flex-shrink: 0;
 }
 
+.cards__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.cards__code {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 2px 7px;
+  border-radius: var(--r-chip);
+  background: var(--grape-soft);
+  color: var(--grape);
+  flex-shrink: 0;
+}
+
 /* ---- Switch ---- */
 
 .switch {
