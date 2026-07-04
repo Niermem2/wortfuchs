@@ -11,7 +11,7 @@ import 'dotenv/config'
 import ExcelJS from 'exceljs'
 import { createClient } from '@supabase/supabase-js'
 
-const XLSX_PATH = process.argv[2] ?? 'Vokabeln_GreenLine_2021_gesamt.xlsx'
+const XLSX_PATH = process.argv[2] ?? 'Vokabeln_GreenLine_BW2016_gesamt.xlsx'
 
 const url = process.env.SUPABASE_URL
 const key = process.env.SUPABASE_SERVICE_KEY
@@ -31,68 +31,116 @@ interface Row {
   exampleDe: string
 }
 
-/* Offizielle Abschnittstitel je Band (Quelle: Klett-Produktseiten „Buchaufbau",
-   ISBN 978-3-12-864010-5 / -864020-4 / -864030-3 / -864040-2) */
+/* Offizielle Abschnittstitel je Band. Band 2+3: Green Line BW (Ausgabe 2016),
+   Band 1/4/5: Green Line Bundesausgabe 2014 (für BW nicht separat erschienen).
+   Quelle: Klett-Stoffverteilungspläne (assets.klett.de) + Produktseiten. */
 const BAND_TITLES: Record<number, Record<string, string>> = {
   1: {
-    U1: 'A new school',
-    U2: 'At home',
-    U3: 'Our Greenwich',
-    U4: 'Happy Birthday',
-    AC1: 'Across cultures 1: Greenwich: A special corner of London',
-    AC2: 'Across cultures 2: How does it taste?',
-    MS1: 'Media smart: Writing texts on computers',
+    PUA: "Pick-up A: I'm from Greenwich",
+    PUB: 'Pick-up B: This is fun!',
+    U1: "It's fun at home",
+    U2: "I'm new at TTS",
+    U3: 'I like my busy days',
+    U4: "Let's do something fun",
+    U5: "Let's go shopping",
+    U6: "It's my party",
+    AC1: 'Across cultures 1',
+    AC2: 'Across cultures 2',
+    AC3: 'Across cultures 3',
   },
   2: {
-    U1: 'The new boy',
-    U2: 'London: Wow!',
-    U3: 'Star of the internet',
-    U4: "What's your sport?",
-    U5: 'Scotland, here we come!',
-    AC1: 'Across cultures 1: London: A world city',
-    AC2: 'Across cultures 2: Special days in the British Isles',
-    MS1: 'Media smart: Searching for information online',
+    U1: 'My friends and I',
+    U2: 'London is amazing!',
+    U3: 'Sport is good for you!',
+    U4: 'Stay in touch',
+    U5: 'Goodbye Greenwich',
+    AC1: "Across cultures 1: Let's discover TTS!",
+    AC2: 'Across cultures 2: London: A special city',
+    AC3: 'Across cultures 3: English around the world',
+    AC4: 'Across cultures 4: British stories and legends',
   },
   3: {
-    U1: 'The weekend workshop',
-    U2: 'Welcome to Wales – Croeso i Gymru',
-    U3: 'The Emerald Isle',
-    U4: 'Faces of Britain',
-    AC1: 'Across cultures 1: The British Isles',
-    AC2: 'Across cultures 2: Staying with a host family',
-    MS: 'Media smart: The power of pictures',
-    TS1: 'Text smart 1: Lyrical texts',
+    U1: 'Find your place',
+    U2: "Let's go to Scotland",
+    U3: 'What was it like?',
+    U4: 'On the move',
+    TS1: 'Text smart 1: Poems and songs',
     TS2: 'Text smart 2: Factual texts',
-    TR: 'Trailer: A trip to Dublin',
+    TS3: 'Text smart 3: Fictional texts',
+    TS4: 'Text smart 4: Drama',
+    AC1: 'Across cultures 1: Reacting to a new situation',
+    AC2: 'Across cultures 2: Making small talk',
+    AC3: "Across cultures 3: Dos and don'ts",
   },
   4: {
-    U1: 'New York City: The Big Apple',
-    U2: 'A new life in New England',
-    U3: 'The Desert Southwest',
-    U4: "California — Pacific 'paradise'?",
-    AC1: 'Across cultures 1: A first look at the USA',
-    AC2: 'Across cultures 2: Schools in the US',
-    AC3: 'Across cultures 3: Indigenous Americans',
-    MS: 'Media smart: The framing effect',
-    TS1: 'Text smart 1: Visual texts',
-    TS2: 'Text smart 2: Fictional texts',
+    U1: 'Kids in America',
+    U2: 'City of dreams: New York',
+    U3: 'A nation invents itself',
+    U4: 'The Pacific Northwest',
+    TS1: 'Text smart 1: Advertisements',
+    TS2: 'Text smart 2: Internet texts',
+    TS3: 'Text smart 3: Travel texts',
+    AC1: 'Across cultures 1: The USA: Country of contrasts',
+    AC2: 'Across cultures 2: School life – dos and don’ts',
+    AC3: 'Across cultures 3: What you say and how you say it',
+    AC4: 'Across cultures 4: At home with an American family',
+  },
+  5: {
+    U1: "G'day Australia!",
+    U2: 'The good life?',
+    U3: 'California dreaming',
+    TS1: 'Text smart 1: A short film',
+    TS2: 'Text smart 2: Informative texts',
+    TS3: 'Text smart 3: Argumentative texts',
+    AC1: 'Across cultures 1: The world speaks English',
+    AC2: 'Across cultures 2: The language of tolerance and respect',
+    AC3: 'Across cultures 3: Having a voice',
   },
 }
 
-/** Anzeigename einer Lektion: offizieller Band-Titel, sonst Langname aus dem
-    Blatt „Lektionen", sonst der Code selbst. */
+/* Teilabschnitte innerhalb einer Lektion (zweite Spalte der Klett-Vokabellisten) */
+const PART_NAMES: Record<string, string> = {
+  CI: 'Check-in',
+  S1: 'Station 1',
+  S2: 'Station 2',
+  S3: 'Station 3',
+  ST: 'Story',
+  ST1: 'Story 1',
+  ST2: 'Story 2',
+  STA: 'Story A',
+  STB: 'Story B',
+  SK: 'Skills',
+  SK1: 'Skills 1',
+  SK2: 'Skills 2',
+  SK3: 'Skills 3',
+  UT: 'Unit task',
+  UT1: 'Unit task 1',
+  UT2: 'Unit task 2',
+  CO: 'Check-out',
+  IN: 'Introduction',
+  FP: 'Focus',
+  FP1: 'Focus 1',
+  FP2: 'Focus 2',
+  F1: 'Part 1',
+  F2: 'Part 2',
+  SC1: 'Scene 1',
+  SC2: 'Scene 2',
+  SC3: 'Scene 3',
+  SC4: 'Scene 4',
+  OP: 'Extras',
+}
+
+/** Anzeigename einer Lektion: Langname aus dem Blatt „Lektionen" (falls
+    vorhanden, als manueller Override), sonst Band-Titel + Teilabschnitt,
+    sonst der Code selbst. Codes: "U1 S2", "AC1", "TS4 SC2", "PUA" … */
 function lessonName(bookId: number, code: string, sheetNames: Map<string, string>): string {
-  const titles = BAND_TITLES[bookId] ?? {}
-  const unit = code.match(/^(U\d)(?:\s+(.+))?$/)
-  if (!unit && titles[code]) return titles[code]
-  if (unit && titles[unit[1]]) {
-    const sheetName = sheetNames.get(code)
-    // Teil-Bezeichnung („Station 1", „Check-in" …) aus dem Blatt-Langnamen
-    const part = sheetName?.match(/^Unit \d: (.+)$/)?.[1]
-    const base = `Unit ${unit[1].slice(1)}: ${titles[unit[1]]}`
-    return part ? `${base} · ${part}` : base
-  }
-  return sheetNames.get(code) ?? code
+  const fromSheet = sheetNames.get(code)
+  if (fromSheet) return fromSheet
+  const [base, part] = code.split(/\s+/) as [string, string?]
+  const title = (BAND_TITLES[bookId] ?? {})[base]
+  if (!title) return code
+  const display = /^U\d$/.test(base) ? `Unit ${base.slice(1)}: ${title}` : title
+  return part ? `${display} · ${PART_NAMES[part] ?? part}` : display
 }
 
 async function readRows(): Promise<{ rows: Row[]; lessonNames: Map<string, string> }> {
