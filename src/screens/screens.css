@@ -366,6 +366,63 @@
   font-size: 14px;
 }
 
+/* ---- Fortschritt (Report) ---- */
+
+.report__trend {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.report__trend--up {
+  color: var(--mint-deep);
+}
+
+.report__trend--down {
+  color: var(--berry-deep);
+}
+
+.report__days {
+  margin-top: 8px;
+}
+
+.report__day--today {
+  background: var(--fox);
+}
+
+.report__label--today {
+  color: var(--fox);
+  font-weight: 700;
+}
+
+.report__records {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.report__record {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.report__record svg {
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.report__record span {
+  flex: 1;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.report__record b {
+  font-weight: 700;
+}
+
 /* ---- Profil ---- */
 
 .profile__section {

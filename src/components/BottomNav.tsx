@@ -1,7 +1,7 @@
-import { GraduationCap, Layers, Trophy, Users, CircleUser } from 'lucide-react'
+import { GraduationCap, Layers, TrendingUp, Users, CircleUser } from 'lucide-react'
 import './ui.css'
 
-export type Tab = 'learn' | 'cards' | 'ranking' | 'profile'
+export type Tab = 'learn' | 'cards' | 'report' | 'profile'
 
 export function BottomNav({
   tab,
@@ -16,8 +16,8 @@ export function BottomNav({
     { id: 'learn', label: 'Lernen', icon: GraduationCap },
     { id: 'cards', label: 'Karten', icon: Layers },
     parent
-      ? { id: 'ranking', label: 'Familie', icon: Users }
-      : { id: 'ranking', label: 'Rangliste', icon: Trophy },
+      ? { id: 'report', label: 'Familie', icon: Users }
+      : { id: 'report', label: 'Fortschritt', icon: TrendingUp },
     { id: 'profile', label: 'Profil', icon: CircleUser },
   ]
   return (

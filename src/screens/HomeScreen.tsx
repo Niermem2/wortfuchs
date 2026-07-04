@@ -5,10 +5,7 @@ import { db } from '../data/db'
 import { collectDueCards, levelProgress, MAX_PHASE } from '../learn/srs'
 import { localDay } from '../learn/stats'
 import { Button, LevelRing, StreakPill, XPBadge, ProgressBar } from '../components/ui'
-import { Heatmap } from '../components/Heatmap'
 import './screens.css'
-
-const PHASE_LABELS = ['Neu', 'P1', 'P2', 'P3', 'P4', 'P5', 'Gelernt']
 
 function daysUntil(date: string | null): number | null {
   if (!date) return null
@@ -36,16 +33,6 @@ export function HomeScreen({
     [profile.id, settings],
   )
 
-  const phaseStats = useLiveQuery(async () => {
-    if (settings.activeLessons.length === 0) return null
-    const cards = await db.cards.where('lesson_id').anyOf(settings.activeLessons).toArray()
-    const progress = await db.progress.where('user_id').equals(profile.id).toArray()
-    const byCard = new Map(progress.map((p) => [p.card_id, p.phase]))
-    const counts = Array.from({ length: MAX_PHASE + 1 }, () => 0)
-    for (const c of cards) counts[byCard.get(c.id) ?? 0]++
-    return { counts, total: cards.length }
-  }, [profile.id, settings])
-
   // App-Badge (installierte PWA): Anzahl fälliger Karten am Homescreen-Icon
   useEffect(() => {
     if (due === undefined || !('setAppBadge' in navigator)) return
@@ -53,16 +40,6 @@ export function HomeScreen({
       () => {},
     )
   }, [due])
-
-  const activityByDay = useLiveQuery(async () => {
-    const map = new Map<string, number>()
-    const sessions = await db.sessions.where('user_id').equals(profile.id).toArray()
-    for (const s of sessions) {
-      const key = localDay(new Date(s.started_at))
-      map.set(key, (map.get(key) ?? 0) + s.cards_seen)
-    }
-    return map
-  }, [profile.id])
 
   const upcoming = useLiveQuery(async () => {
     if (settings.activeLessons.length === 0) return null
@@ -164,29 +141,6 @@ export function HomeScreen({
         </div>
       )}
 
-      {phaseStats && phaseStats.total > 0 && (
-        <div className="card">
-          <h3>Dein Fortschritt</h3>
-          <p className="home__sub">
-            {phaseStats.counts[MAX_PHASE]} von {phaseStats.total} Vokabeln im Langzeitgedächtnis
-          </p>
-          <div className="home__phases">
-            {phaseStats.counts.map((n, i) => (
-              <div key={i} className="home__phase">
-                <div className="home__phase-bar">
-                  <div
-                    className={`home__phase-fill ${i === MAX_PHASE ? 'home__phase-fill--done' : ''}`}
-                    style={{ height: `${phaseStats.total ? Math.max(n > 0 ? 8 : 0, (n / phaseStats.total) * 100) : 0}%` }}
-                  />
-                </div>
-                <span className="home__phase-num">{n}</span>
-                <span className="home__phase-label">{PHASE_LABELS[i]}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       <div className="card">
         <h3>Tagesziel</h3>
         <p className="home__sub">
@@ -212,15 +166,6 @@ export function HomeScreen({
         </div>
       )}
 
-      {activityByDay && activityByDay.size > 0 && (
-        <div className="card">
-          <h3>Deine Aktivität</h3>
-          <p className="home__sub">Karten pro Tag, letzte 12 Wochen</p>
-          <div className="home__heatmap">
-            <Heatmap byDay={activityByDay} />
-          </div>
-        </div>
-      )}
     </div>
   )
 }

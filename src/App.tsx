@@ -11,7 +11,7 @@ import { BottomNav, type Tab } from './components/BottomNav'
 import { HomeScreen } from './screens/HomeScreen'
 import { SessionScreen } from './screens/SessionScreen'
 import { CardsScreen } from './screens/CardsScreen'
-import { RankingScreen } from './screens/RankingScreen'
+import { ReportScreen } from './screens/ReportScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
 import { LoginScreen } from './screens/LoginScreen'
 import { TestPrepScreen } from './screens/TestPrepScreen'
@@ -107,8 +107,16 @@ export default function App() {
         />
       )}
       {tab === 'cards' && <CardsScreen profile={profile} settings={settings} />}
-      {tab === 'ranking' &&
-        (profile.role === 'parent' ? <FamilyScreen /> : <RankingScreen profile={profile} />)}
+      {tab === 'report' &&
+        (profile.role === 'parent' ? (
+          <FamilyScreen />
+        ) : (
+          <ReportScreen
+            profile={profile}
+            settings={settings}
+            onPractice={(cards) => setSession({ cards, pool: cards, mode: 'test' })}
+          />
+        ))}
       {tab === 'profile' && (
         <ProfileScreen profile={profile} settings={settings} onLogout={() => setUserId(null)} />
       )}
