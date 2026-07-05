@@ -52,6 +52,43 @@ export async function countDue(userId: string, settings: SettingsData): Promise<
   return cards.length
 }
 
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+/** Extra-Übungsrunde, wenn nichts fällig ist: schwächste Karten zuerst
+    (niedrige Phase, viele Fehler), Gold-Karten nur als Auffüller.
+    Läuft im Test-Modus und lässt das Phasensystem unberührt. */
+export async function collectPracticeCards(
+  userId: string,
+  settings: SettingsData,
+  limit: number,
+): Promise<Card[]> {
+  if (settings.activeLessons.length === 0) return []
+  const cards = await db.cards
+    .where('lesson_id')
+    .anyOf(settings.activeLessons)
+    .filter((c) => c.active)
+    .toArray()
+
+  const progress = new Map<string, CardProgress>()
+  for (const p of await db.progress.where('user_id').equals(userId).toArray()) {
+    progress.set(p.card_id, p)
+  }
+  const rank = (card: Card) => {
+    const p = progress.get(card.id)
+    return (p?.phase ?? 0) * 100 - Math.min(p?.wrong_count ?? 0, 99)
+  }
+  // Erst mischen, dann stabil sortieren → zufällige Reihenfolge bei gleichem Rang
+  const weakestFirst = shuffle(cards).sort((a, b) => rank(a) - rank(b))
+  return shuffle(weakestFirst.slice(0, limit))
+}
+
 /** Wendet eine Antwort an und liefert die neue Phase zurück. */
 export async function applyAnswer(
   userId: string,

@@ -101,7 +101,7 @@ export default function App() {
         <HomeScreen
           profile={profile}
           settings={settings}
-          onStart={(cards, pool) => setSession({ cards, pool, mode: 'learn' })}
+          onStart={(cards, pool, mode) => setSession({ cards, pool, mode })}
           onTestPrep={() => setTestPrepOpen(true)}
           onVerbs={() => setVerbsOpen(true)}
         />
@@ -120,7 +120,7 @@ export default function App() {
       {tab === 'profile' && (
         <ProfileScreen profile={profile} settings={settings} onLogout={() => setUserId(null)} />
       )}
-      <BottomNav tab={tab} onChange={setTab} parent={profile.role === 'parent'} />
+      <BottomNav tab={tab} onChange={setTab} />
     </>
   )
 }

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import type { Card, Profile, SettingsData } from '../data/types'
 import { db } from '../data/db'
-import { collectDueCards, levelProgress, MAX_PHASE } from '../learn/srs'
+import { collectDueCards, collectPracticeCards, levelProgress, MAX_PHASE } from '../learn/srs'
 import { localDay } from '../learn/stats'
 import { Button, LevelRing, StreakPill, XPBadge, ProgressBar } from '../components/ui'
 import './screens.css'
@@ -24,7 +24,7 @@ export function HomeScreen({
 }: {
   profile: Profile
   settings: SettingsData
-  onStart: (cards: Card[], pool: Card[]) => void
+  onStart: (cards: Card[], pool: Card[], mode: 'learn' | 'test') => void
   onTestPrep: () => void
   onVerbs: () => void
 }) {
@@ -77,9 +77,14 @@ export function HomeScreen({
   }, [profile.id])
 
   async function start() {
-    if (!due?.length) return
     const pool = await db.cards.where('lesson_id').anyOf(settings.activeLessons).toArray()
-    onStart(due.slice(0, settings.dailyGoal), pool)
+    if (due?.length) {
+      onStart(due.slice(0, settings.dailyGoal), pool, 'learn')
+      return
+    }
+    // Nichts fällig: Extra-Übungsrunde (Test-Modus, Phasensystem bleibt unberührt)
+    const practice = await collectPracticeCards(profile.id, settings, settings.dailyGoal)
+    if (practice.length) onStart(practice, pool, 'test')
   }
 
   return (
@@ -102,14 +107,16 @@ export function HomeScreen({
               : due.length === 0
                 ? settings.activeLessons.length === 0
                   ? 'Aktiviere unter „Karten" deine erste Lektion.'
-                  : 'Alles gelernt für heute.'
+                  : 'Alles Fällige gelernt — Extra-Runden gehen immer.'
                 : `${due.length} ${due.length === 1 ? 'Karte wartet' : 'Karten warten'} auf dich.`}
           </p>
         </div>
       </div>
 
-      <Button block onClick={start} disabled={!due?.length}>
-        {due?.length ? `Jetzt lernen (${Math.min(due.length, settings.dailyGoal)})` : 'Nichts fällig'}
+      <Button block onClick={start} disabled={due === undefined || settings.activeLessons.length === 0}>
+        {due?.length
+          ? `Jetzt lernen (${Math.min(due.length, settings.dailyGoal)})`
+          : 'Extra-Runde üben'}
       </Button>
 
       {settings.testPrep ? (

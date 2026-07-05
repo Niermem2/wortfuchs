@@ -366,6 +366,97 @@
   font-size: 14px;
 }
 
+.family__views {
+  margin-top: -4px;
+}
+
+.family__week--three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.family__icon {
+  color: var(--ink-soft);
+}
+
+.family__book {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.family__book-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.family__book-head .progress {
+  flex: 1;
+}
+
+.family__book-name {
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.family__book-count {
+  flex-shrink: 0;
+}
+
+.family__hard-row--wide {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.family__hard-meta {
+  font-size: 12px;
+}
+
+.family__gold-star {
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.family__log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.family__log-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.family__log-date {
+  font-weight: 600;
+  width: 88px;
+  flex-shrink: 0;
+}
+
+.family__log-mode {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 2px 7px;
+  border-radius: var(--r-chip);
+  background: var(--grape-soft);
+  color: var(--grape);
+  flex-shrink: 0;
+}
+
+.family__log-row .home__sub {
+  margin-left: auto;
+  text-align: right;
+}
+
 /* ---- Fortschritt (Report) ---- */
 
 .report__trend {
