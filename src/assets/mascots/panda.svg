@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="head" cx="38%" cy="24%" r="90%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="55%" stop-color="#f7f5f8"/>
+      <stop offset="100%" stop-color="#d9d4de"/>
+    </radialGradient>
+    <radialGradient id="ao" cx="50%" cy="42%" r="58%">
+      <stop offset="62%" stop-color="#6d6478" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#6d6478" stop-opacity="0.22"/>
+    </radialGradient>
+    <radialGradient id="sheen" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ear" cx="38%" cy="25%" r="90%">
+      <stop offset="0%" stop-color="#4d4658"/>
+      <stop offset="100%" stop-color="#1e1926"/>
+    </radialGradient>
+    <radialGradient id="blush" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff97ac" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ff97ac" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="13.5" cy="16" r="8.5" fill="url(#ear)"/>
+  <circle cx="50.5" cy="16" r="8.5" fill="url(#ear)"/>
+  <ellipse cx="11" cy="13" rx="3" ry="2" fill="#ffffff" opacity="0.22" transform="rotate(-22 11 13)"/>
+  <ellipse cx="48" cy="13" rx="3" ry="2" fill="#ffffff" opacity="0.22" transform="rotate(-22 48 13)"/>
+
+  <ellipse cx="32" cy="36.5" rx="21.5" ry="19.5" fill="url(#head)"/>
+  <ellipse cx="32" cy="36.5" rx="21.5" ry="19.5" fill="url(#ao)"/>
+  <ellipse cx="24" cy="25" rx="12" ry="9" fill="url(#sheen)"/>
+
+  <ellipse cx="16.5" cy="43" rx="4.3" ry="3.2" fill="url(#blush)"/>
+  <ellipse cx="47.5" cy="43" rx="4.3" ry="3.2" fill="url(#blush)"/>
+
+  <ellipse cx="22.5" cy="33" rx="6.3" ry="7.8" fill="#2a2433" transform="rotate(-16 22.5 33)"/>
+  <ellipse cx="41.5" cy="33" rx="6.3" ry="7.8" fill="#2a2433" transform="rotate(16 41.5 33)"/>
+  <circle cx="24" cy="32.7" r="2.8" fill="#ffffff"/>
+  <circle cx="40" cy="32.7" r="2.8" fill="#ffffff"/>
+  <circle cx="24.3" cy="33" r="1.6" fill="#171221"/>
+  <circle cx="39.7" cy="33" r="1.6" fill="#171221"/>
+  <circle cx="23.7" cy="32.2" r="0.65" fill="#ffffff"/>
+  <circle cx="39.1" cy="32.2" r="0.65" fill="#ffffff"/>
+
+  <path d="M29 43.3 Q32 41.9 35 43.3 Q35.5 46 32 47.6 Q28.5 46 29 43.3 Z" fill="#2a2433"/>
+  <ellipse cx="30.5" cy="43.8" rx="1.1" ry="0.7" fill="#ffffff" opacity="0.5"/>
+
+  <path d="M27.5 50.2 Q32 53.4 36.5 50.2 Q35 54.6 32 54.6 Q29 54.6 27.5 50.2 Z" fill="#472e35"/>
+</svg>

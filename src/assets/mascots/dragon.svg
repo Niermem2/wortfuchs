@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="head" cx="36%" cy="24%" r="90%">
+      <stop offset="0%" stop-color="#7fe3ac"/>
+      <stop offset="45%" stop-color="#3cb376"/>
+      <stop offset="100%" stop-color="#1b8250"/>
+    </radialGradient>
+    <radialGradient id="ao" cx="50%" cy="42%" r="58%">
+      <stop offset="62%" stop-color="#0c4d2d" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0c4d2d" stop-opacity="0.3"/>
+    </radialGradient>
+    <radialGradient id="sheen" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="horn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdf3da"/>
+      <stop offset="100%" stop-color="#e3cc94"/>
+    </linearGradient>
+    <radialGradient id="snout" cx="45%" cy="22%" r="90%">
+      <stop offset="0%" stop-color="#d6f6e3"/>
+      <stop offset="100%" stop-color="#96d8b4"/>
+    </radialGradient>
+    <radialGradient id="blush" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffa8b8" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#ffa8b8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tongue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff9d9d"/>
+      <stop offset="100%" stop-color="#f2606c"/>
+    </linearGradient>
+    <clipPath id="mouth"><path d="M26.5 48.5 Q32 51 37.5 48.5 Q36.6 54.6 32 54.6 Q27.4 54.6 26.5 48.5 Z"/></clipPath>
+  </defs>
+
+  <path d="M17.5 17.5 Q13.5 8.5 15.5 4.5 Q21.5 6 25.5 12 Q21.5 15.3 17.5 17.5 Z" fill="url(#horn)"/>
+  <path d="M46.5 17.5 Q50.5 8.5 48.5 4.5 Q42.5 6 38.5 12 Q42.5 15.3 46.5 17.5 Z" fill="url(#horn)"/>
+  <path d="M27.5 13 Q29.5 8.5 32 8 Q34.5 8.5 36.5 13 Q32 15.5 27.5 13 Z" fill="url(#horn)"/>
+
+  <ellipse cx="32" cy="36.5" rx="21" ry="19.5" fill="url(#head)"/>
+  <ellipse cx="32" cy="36.5" rx="21" ry="19.5" fill="url(#ao)"/>
+  <ellipse cx="24" cy="25" rx="12" ry="9" fill="url(#sheen)"/>
+
+  <ellipse cx="32" cy="46.5" rx="12.5" ry="9.5" fill="url(#snout)"/>
+
+  <ellipse cx="17" cy="41" rx="4.2" ry="3.2" fill="url(#blush)"/>
+  <ellipse cx="47" cy="41" rx="4.2" ry="3.2" fill="url(#blush)"/>
+
+  <path d="M19.5 28.4 Q22.4 26.7 25.5 27.7" stroke="#137048" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  <path d="M44.5 28.4 Q41.6 26.7 38.5 27.7" stroke="#137048" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+
+  <ellipse cx="23.5" cy="33" rx="3.2" ry="3.8" fill="#0d2e1e"/>
+  <ellipse cx="40.5" cy="33" rx="3.2" ry="3.8" fill="#0d2e1e"/>
+  <circle cx="22.4" cy="31.5" r="1.25" fill="#ffffff"/>
+  <circle cx="39.4" cy="31.5" r="1.25" fill="#ffffff"/>
+  <circle cx="24.6" cy="34.5" r="0.55" fill="#ffffff" opacity="0.85"/>
+  <circle cx="41.6" cy="34.5" r="0.55" fill="#ffffff" opacity="0.85"/>
+
+  <ellipse cx="28" cy="44" rx="1.5" ry="1.9" fill="#0d2e1e"/>
+  <ellipse cx="36" cy="44" rx="1.5" ry="1.9" fill="#0d2e1e"/>
+
+  <path d="M26.5 48.5 Q32 51 37.5 48.5 Q36.6 54.6 32 54.6 Q27.4 54.6 26.5 48.5 Z" fill="#134a30"/>
+  <g clip-path="url(#mouth)">
+    <ellipse cx="32" cy="54.2" rx="5" ry="4.2" fill="url(#tongue)"/>
+  </g>
+  <path d="M28.2 49.3 L30 49.7 L28.9 51.2 Z" fill="#ffffff"/>
+  <path d="M35.8 49.3 L34 49.7 L35.1 51.2 Z" fill="#ffffff"/>
+</svg>

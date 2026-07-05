@@ -15,7 +15,7 @@ Läuft im Browser und als installierte PWA auf dem iPhone. Offline-first.
 - `npm run dev` — Dev-Server
 - `npm run build` — Produktions-Build (inkl. TypeScript-Check)
 - `npm run import` — Excel-Import nach Supabase (braucht `.env` mit Service-Key, siehe SETUP.md)
-- `python3 scripts/gen-icons.py` — PWA-Icons für alle Maskottchen neu erzeugen
+- `node scripts/gen-icons.mjs` — PWA-Icons für alle Maskottchen neu erzeugen (aus `src/assets/mascots/*.svg`)
 
 ## Architektur-Regeln
 

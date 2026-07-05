@@ -1,0 +1,30 @@
+{
+  "name": "Wortfuchs",
+  "short_name": "Wortfuchs",
+  "description": "Dein Vokabeltrainer",
+  "lang": "de",
+  "start_url": "../",
+  "scope": "../",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#6B47E8",
+  "background_color": "#F4F1FA",
+  "icons": [
+    {
+      "src": "../icons/bear-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "../icons/bear-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "../icons/bear-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

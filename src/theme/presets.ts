@@ -1,6 +1,19 @@
 export type ThemeId = 'grape' | 'ocean' | 'teal' | 'pink'
 export type Mode = 'auto' | 'light' | 'dark'
-export type MascotId = 'fox' | 'owl' | 'panda' | 'dragon'
+export type MascotId =
+  | 'dog'
+  | 'cat'
+  | 'fox'
+  | 'panda'
+  | 'koala'
+  | 'rabbit'
+  | 'bear'
+  | 'tiger'
+  | 'monkey'
+  | 'pig'
+  | 'unicorn'
+  | 'owl'
+  | 'dragon'
 
 export const THEMES: { id: ThemeId; label: string; color: string }[] = [
   { id: 'grape', label: 'Violett', color: '#6b47e8' },
@@ -10,9 +23,18 @@ export const THEMES: { id: ThemeId; label: string; color: string }[] = [
 ]
 
 export const MASCOTS: { id: MascotId; label: string }[] = [
+  { id: 'dog', label: 'Hund' },
+  { id: 'cat', label: 'Katze' },
   { id: 'fox', label: 'Fuchs' },
-  { id: 'owl', label: 'Eule' },
   { id: 'panda', label: 'Panda' },
+  { id: 'koala', label: 'Koala' },
+  { id: 'rabbit', label: 'Hase' },
+  { id: 'bear', label: 'Bär' },
+  { id: 'tiger', label: 'Tiger' },
+  { id: 'monkey', label: 'Affe' },
+  { id: 'pig', label: 'Schwein' },
+  { id: 'unicorn', label: 'Einhorn' },
+  { id: 'owl', label: 'Eule' },
   { id: 'dragon', label: 'Drache' },
 ]
 
