@@ -1,0 +1,23 @@
+# Hält das Supabase-Free-Tier-Projekt aktiv: ein API-Request pro Tag
+# verhindert die Pausierung nach 7 Tagen Inaktivität (z. B. in den Ferien).
+# Liefert wegen RLS keine Daten (anon sieht nichts) — zählt aber als Aktivität.
+name: Supabase Keep-alive
+
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Supabase anpingen
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          curl -sf "$SUPABASE_URL/rest/v1/books?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" > /dev/null
+          echo "Supabase-Projekt aktiv gehalten."
