@@ -55,6 +55,8 @@ SINGLES = {
     "I": "ɪ", "E": "ə", "U": "ʊ", "O": "ɒ", "C": "ɔ", "A": "ɑ",
     "0": "ʌ", "x": "æ", "S": "ʃ", "Z": "ʒ", "T": "θ", "D": "ð",
     "N": "ŋ", "G": "ɡ", "g": "ɡ", "X": "x", "a": "ʌ",
+    # Tippfehler im Klett-PDF (Band 2 2021: „a/one thousand")
+    '"': "",
 }
 # Zeichen, die unverändert gültiges IPA/Beiwerk sind
 IDENTITY = set("bdefhijklmnprstuvwz iue'’,;.()/- …:")

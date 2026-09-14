@@ -13,6 +13,8 @@ dev-dist/
 *.xlsx
 *.pdf
 seed/
+Englisch-Klasse-*/
 
 # System
 .DS_Store
+__pycache__/
