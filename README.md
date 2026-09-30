@@ -2,6 +2,7 @@
   <img src="public/icons/fox-192.png" width="96" alt="Wortfuchs" />
 </p>
 
+
 <h1 align="center">Wortfuchs</h1>
 
 <p align="center">
