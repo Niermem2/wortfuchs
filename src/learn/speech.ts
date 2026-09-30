@@ -42,7 +42,9 @@ export function listEnglishVoices(): SpeechSynthesisVoice[] {
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 
-function bestVoice(lang: 'en' | 'de'): SpeechSynthesisVoice | undefined {
+export type SpeechLang = 'en' | 'de' | 'es' | 'la'
+
+function bestVoice(lang: 'en' | 'de' | 'es'): SpeechSynthesisVoice | undefined {
   const c = voices.filter((v) => norm(v.lang).startsWith(lang))
   if (lang === 'en') {
     const preferred = prefs.voiceURI ? c.find((v) => v.voiceURI === prefs.voiceURI) : undefined
@@ -54,6 +56,14 @@ function bestVoice(lang: 'en' | 'de'): SpeechSynthesisVoice | undefined {
       c[0]
     )
   }
+  if (lang === 'es') {
+    return (
+      c.find((v) => norm(v.lang) === 'es-es' && v.localService) ??
+      c.find((v) => norm(v.lang) === 'es-es') ??
+      c.find((v) => v.localService) ??
+      c[0]
+    )
+  }
   return (
     c.find((v) => norm(v.lang) === 'de-de' && v.localService) ??
     c.find((v) => norm(v.lang) === 'de-de') ??
@@ -61,13 +71,14 @@ function bestVoice(lang: 'en' | 'de'): SpeechSynthesisVoice | undefined {
   )
 }
 
-export function speak(text: string, lang: 'en' | 'de' = 'en') {
+export function speak(text: string, lang: SpeechLang = 'en') {
+  if (lang === 'la') return // keine lateinische Stimme
   if (!canSpeak() || !text) return
   speechSynthesis.cancel()
   const utter = new SpeechSynthesisUtterance(text)
   const voice = bestVoice(lang)
   if (voice) utter.voice = voice
-  utter.lang = voice?.lang ?? (lang === 'de' ? 'de-DE' : 'en-GB')
+  utter.lang = voice?.lang ?? (lang === 'de' ? 'de-DE' : lang === 'es' ? 'es-ES' : 'en-GB')
   utter.rate = prefs.rate
   speechSynthesis.speak(utter)
 }

@@ -1,9 +1,13 @@
 import type { ThemeId, Mode, MascotId } from '../theme/presets'
 
+/** Lernfach = Sprache des Buchs. Bücher ohne Angabe gelten als Englisch. */
+export type Subject = 'en' | 'la' | 'es'
+
 export interface Book {
   id: number
   name: string
   sort_order: number
+  language?: Subject
 }
 
 export interface Lesson {
@@ -94,6 +98,8 @@ export interface SettingsData {
   dailyGoal: number
   /** Wiederholungsabstände in Tagen je Phase (Index 0 = Phase 1) */
   intervals: number[]
+  /** Aktuell gewähltes Lernfach (Startseite) */
+  subject: Subject
   activeLessons: number[]
   /** Aktive Testvorbereitung (Lektionen + optionales Zieldatum) */
   testPrep: { lessons: number[]; date: string | null } | null
@@ -119,6 +125,7 @@ export const DEFAULT_SETTINGS: SettingsData = {
   speechRate: 0.95,
   dailyGoal: 20,
   intervals: [0, 1, 3, 9, 30, 90],
+  subject: 'en',
   activeLessons: [],
   testPrep: null,
 }

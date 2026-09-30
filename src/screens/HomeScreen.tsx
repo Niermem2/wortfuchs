@@ -3,6 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import type { Card, Profile, SettingsData } from '../data/types'
 import { db } from '../data/db'
 import { collectDueCards, collectPracticeCards, levelProgress, MAX_PHASE } from '../learn/srs'
+import { updateSettings } from '../data/settings'
+import { activeLessonIds, availableSubjects, SUBJECTS } from '../data/subjects'
 import { localDay } from '../learn/stats'
 import { Button, LevelRing, StreakPill, XPBadge, ProgressBar } from '../components/ui'
 import './screens.css'
@@ -41,10 +43,24 @@ export function HomeScreen({
     )
   }, [due])
 
+  const lessonIds = useLiveQuery(() => activeLessonIds(settings), [settings])
+
+  // Fächer-Kacheln: nur Fächer mit Buch, je mit Zahl der fälligen Karten
+  const subjects = useLiveQuery(async () => {
+    const ids = await availableSubjects()
+    return Promise.all(
+      ids.map(async (id) => ({
+        id,
+        due: (await collectDueCards(profile.id, settings, Number.MAX_SAFE_INTEGER, id)).length,
+      })),
+    )
+  }, [profile.id, settings])
+
   const upcoming = useLiveQuery(async () => {
-    if (settings.activeLessons.length === 0) return null
+    const ids = await activeLessonIds(settings)
+    if (ids.length === 0) return null
     const cardIds = new Set(
-      (await db.cards.where('lesson_id').anyOf(settings.activeLessons).toArray())
+      (await db.cards.where('lesson_id').anyOf(ids).toArray())
         .filter((c) => c.active)
         .map((c) => c.id),
     )
@@ -77,7 +93,7 @@ export function HomeScreen({
   }, [profile.id])
 
   async function start() {
-    const pool = await db.cards.where('lesson_id').anyOf(settings.activeLessons).toArray()
+    const pool = await db.cards.where('lesson_id').anyOf(lessonIds ?? []).toArray()
     if (due?.length) {
       onStart(due.slice(0, settings.dailyGoal), pool, 'learn')
       return
@@ -105,7 +121,7 @@ export function HomeScreen({
             {due === undefined
               ? '…'
               : due.length === 0
-                ? settings.activeLessons.length === 0
+                ? !lessonIds?.length
                   ? 'Aktiviere unter „Karten" deine erste Lektion.'
                   : 'Alles Fällige gelernt — Extra-Runden gehen immer.'
                 : `${due.length} ${due.length === 1 ? 'Karte wartet' : 'Karten warten'} auf dich.`}
@@ -113,13 +129,34 @@ export function HomeScreen({
         </div>
       </div>
 
-      <Button block onClick={start} disabled={due === undefined || settings.activeLessons.length === 0}>
+      {subjects && subjects.length > 1 && (
+        <div className="home__subjects" role="tablist" aria-label="Fach wählen">
+          {subjects.map((s) => (
+            <button
+              key={s.id}
+              role="tab"
+              aria-selected={settings.subject === s.id}
+              className={`home__subject${settings.subject === s.id ? ' home__subject--active' : ''}`}
+              onClick={() => updateSettings(profile.id, { subject: s.id })}
+            >
+              <span>{SUBJECTS.find((x) => x.id === s.id)!.label}</span>
+              {s.due > 0 && <small>{s.due > 50 ? '50+' : s.due}</small>}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <Button block onClick={start} disabled={due === undefined || !lessonIds?.length}>
         {due?.length
           ? `Jetzt lernen (${Math.min(due.length, settings.dailyGoal)})`
           : 'Extra-Runde üben'}
       </Button>
 
-      {settings.testPrep ? (
+      {settings.subject !== 'en' ? (
+        <Button block variant="secondary" onClick={onTestPrep}>
+          Test üben
+        </Button>
+      ) : settings.testPrep ? (
         <>
           <button className="card home__testprep" onClick={onTestPrep}>
             <div>

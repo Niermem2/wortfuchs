@@ -811,3 +811,38 @@
   padding: 10px 12px;
   font-weight: 600;
 }
+
+/* Fächer-Auswahl (Startseite) */
+.home__subjects {
+  display: flex;
+  gap: 8px;
+}
+.home__subject {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--ink-soft);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.home__subject small {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--fox-soft);
+  color: var(--fox);
+  font-size: 12px;
+  font-weight: 700;
+}
+.home__subject--active {
+  border-color: var(--grape);
+  background: var(--grape-soft);
+  color: var(--grape);
+}

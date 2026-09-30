@@ -1,3 +1,4 @@
+import { activeLessonIds } from '../data/subjects'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Flame, Star, Trophy } from 'lucide-react'
 import type { Card, Profile, SettingsData } from '../data/types'
@@ -58,8 +59,9 @@ export function ReportScreen({
   }, [profile.id])
 
   const phaseStats = useLiveQuery(async () => {
-    if (settings.activeLessons.length === 0) return null
-    const cards = await db.cards.where('lesson_id').anyOf(settings.activeLessons).toArray()
+    const ids = await activeLessonIds(settings)
+    if (ids.length === 0) return null
+    const cards = await db.cards.where('lesson_id').anyOf(ids).toArray()
     const progress = await db.progress.where('user_id').equals(profile.id).toArray()
     const byCard = new Map(progress.map((p) => [p.card_id, p.phase]))
     const counts = Array.from({ length: MAX_PHASE + 1 }, () => 0)

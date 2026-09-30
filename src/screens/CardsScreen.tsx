@@ -14,7 +14,10 @@ export function CardsScreen({
   profile: Profile
   settings: SettingsData
 }) {
-  const books = useLiveQuery(() => db.books.orderBy('sort_order').toArray(), [])
+  const books = useLiveQuery(
+    async () => (await db.books.orderBy('sort_order').toArray()).filter((b) => (b.language ?? 'en') === settings.subject),
+    [settings.subject],
+  )
   const [bookId, setBookId] = useState<number | null>(null)
   const [openLesson, setOpenLesson] = useState<Lesson | null>(null)
   const activeBook = bookId ?? books?.[0]?.id ?? null
