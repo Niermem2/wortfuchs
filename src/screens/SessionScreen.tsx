@@ -4,7 +4,8 @@ import type { Card, Profile, SettingsData } from '../data/types'
 import { db } from '../data/db'
 import { applyAnswer, awardXp, XP_PER_CORRECT } from '../learn/srs'
 import { checkAnswer } from '../learn/answer-check'
-import { canSpeak, speak } from '../learn/speech'
+import { canSpeak, speak, type SpeechLang } from '../learn/speech'
+import { hasAudio, SUBJECT_LABEL } from '../data/subjects'
 import { Button, HeroCard, AnswerOption, ProgressBar, type AnswerState } from '../components/ui'
 import { Confetti } from '../components/Confetti'
 import { Mascot } from '../components/Mascot'
@@ -30,7 +31,10 @@ function buildQueue(cards: Card[], settings: SettingsData): QueueItem[] {
   return cards.map((card) => ({
     card,
     direction:
-      settings.direction === 'mixed'
+      // Latein: nur Latein → Deutsch (Rückrichtung verlangt Genitiv/Genus/Stammformen exakt)
+      settings.subject === 'la'
+        ? 'en-de'
+        : settings.direction === 'mixed'
         ? Math.random() < 0.5
           ? 'de-en'
           : 'en-de'
@@ -67,6 +71,8 @@ export function SessionScreen({
   const [levelUp, setLevelUp] = useState<number | null>(null)
 
   const item = queue[0]
+  const fl: SpeechLang = settings.subject
+  const audio = canSpeak() && hasAudio(settings.subject)
   const prompt = item ? (item.direction === 'de-en' ? item.card.german : item.card.english) : ''
   const solution = item ? (item.direction === 'de-en' ? item.card.english : item.card.german) : ''
 
@@ -88,8 +94,8 @@ export function SessionScreen({
   // Automatisch vorlesen: englische Seite, sobald sie sichtbar wird
   useEffect(() => {
     if (!settings.autoAudio || !item) return
-    if (phase === 'ask' && item.direction === 'en-de') speak(item.card.english)
-    if (phase === 'feedback' && item.direction === 'de-en') speak(item.card.english)
+    if (phase === 'ask' && item.direction === 'en-de') speak(item.card.english, fl)
+    if (phase === 'feedback' && item.direction === 'de-en') speak(item.card.english, fl)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, item?.card.id, settings.autoAudio])
 
@@ -209,12 +215,12 @@ export function SessionScreen({
       </div>
 
       <HeroCard
-        chip={item.direction === 'de-en' ? 'Deutsch → Englisch' : 'Englisch → Deutsch'}
+        chip={item.direction === 'de-en' ? `Deutsch → ${SUBJECT_LABEL[settings.subject]}` : `${SUBJECT_LABEL[settings.subject]} → Deutsch`}
         word={prompt}
         phonetic={item.direction === 'en-de' ? (item.card.phonetic ?? undefined) : undefined}
       >
-        {item.direction === 'en-de' && canSpeak() && (
-          <button className="btn btn--ghost" onClick={() => speak(item.card.english)} aria-label="Anhören">
+        {item.direction === 'en-de' && audio && (
+          <button className="btn btn--ghost" onClick={() => speak(item.card.english, fl)} aria-label="Anhören">
             <Volume2 size={22} />
           </button>
         )}
@@ -280,12 +286,12 @@ export function SessionScreen({
         <>
           <div className="session__solution card">
             {solution}
-            {canSpeak() && (
+            {audio && (
               <button
                 className="btn btn--ghost"
                 onClick={() =>
                   item.direction === 'de-en'
-                    ? speak(item.card.english)
+                    ? speak(item.card.english, fl)
                     : speak(item.card.german, 'de')
                 }
                 aria-label="Anhören"
@@ -307,12 +313,12 @@ export function SessionScreen({
         <div className={`session__feedback ${lastCorrect ? 'session__feedback--correct' : 'session__feedback--wrong'}`}>
           <p className="session__feedback-title">
             {lastCorrect ? 'Richtig' : `Richtig wäre: ${solution}`}
-            {canSpeak() && (
+            {audio && (
               <button
                 className="btn btn--ghost session__speak"
                 onClick={() =>
                   item.direction === 'de-en'
-                    ? speak(item.card.example_en ? `${item.card.english}. ${item.card.example_en}` : item.card.english)
+                    ? speak(item.card.example_en ? `${item.card.english}. ${item.card.example_en}` : item.card.english, fl)
                     : speak(item.card.german, 'de')
                 }
                 aria-label="Anhören"

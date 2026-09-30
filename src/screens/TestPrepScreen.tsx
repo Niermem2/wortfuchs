@@ -30,7 +30,10 @@ export function TestPrepScreen({
   const [selected, setSelected] = useState<number[]>(settings.testPrep?.lessons ?? [])
   const [date, setDate] = useState(settings.testPrep?.date ?? '')
 
-  const books = useLiveQuery(() => db.books.orderBy('sort_order').toArray(), [])
+  const books = useLiveQuery(
+    async () => (await db.books.orderBy('sort_order').toArray()).filter((b) => (b.language ?? 'en') === settings.subject),
+    [settings.subject],
+  )
   const lessons = useLiveQuery(() => db.lessons.toArray(), [])
   const history = useLiveQuery(
     () =>

@@ -1,5 +1,6 @@
 import { db } from '../data/db'
-import type { Card, CardProgress, SettingsData } from '../data/types'
+import type { Card, CardProgress, SettingsData, Subject } from '../data/types'
+import { activeLessonIds } from '../data/subjects'
 
 /* 6-Phasen-System (phase6-Methodik): richtig → nächste Phase mit größerem
    Abstand, falsch → zurück in Phase 1. Phase 0 = neu, Phase 6 = Langzeit. */
@@ -21,11 +22,13 @@ export async function collectDueCards(
   userId: string,
   settings: SettingsData,
   limit: number,
+  subject: Subject = settings.subject,
 ): Promise<Card[]> {
-  if (settings.activeLessons.length === 0) return []
+  const lessonIds = await activeLessonIds(settings, subject)
+  if (lessonIds.length === 0) return []
   const cards = await db.cards
     .where('lesson_id')
-    .anyOf(settings.activeLessons)
+    .anyOf(lessonIds)
     .filter((c) => c.active)
     .toArray()
 
@@ -69,10 +72,11 @@ export async function collectPracticeCards(
   settings: SettingsData,
   limit: number,
 ): Promise<Card[]> {
-  if (settings.activeLessons.length === 0) return []
+  const lessonIds = await activeLessonIds(settings)
+  if (lessonIds.length === 0) return []
   const cards = await db.cards
     .where('lesson_id')
-    .anyOf(settings.activeLessons)
+    .anyOf(lessonIds)
     .filter((c) => c.active)
     .toArray()
 
