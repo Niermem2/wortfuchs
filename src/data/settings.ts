@@ -3,7 +3,14 @@ import { DEFAULT_SETTINGS, type SettingsData } from './types'
 
 export async function getSettings(userId: string): Promise<SettingsData> {
   const row = await db.settings.get(userId)
-  return { ...DEFAULT_SETTINGS, ...row?.data }
+  const data: SettingsData = { ...DEFAULT_SETTINGS, ...row?.data }
+  // Migration: alter An/Aus-Schalter `typoTolerance` → Prozentwert
+  const legacy = row?.data as { typoTolerance?: boolean; typoTolerancePercent?: number } | undefined
+  if (legacy && legacy.typoTolerancePercent === undefined && legacy.typoTolerance === false) {
+    data.typoTolerancePercent = 0
+  }
+  delete (data as { typoTolerance?: boolean }).typoTolerance
+  return data
 }
 
 export async function updateSettings(userId: string, patch: Partial<SettingsData>) {

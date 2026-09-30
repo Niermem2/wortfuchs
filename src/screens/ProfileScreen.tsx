@@ -6,6 +6,7 @@ import { isLocalMode, signOut } from '../data/auth'
 import { fullSync, getSyncState, onSyncState, type SyncState } from '../data/sync'
 import { levelProgress } from '../learn/srs'
 import { canSpeak, listEnglishVoices, onVoicesChanged, setSpeechPrefs, speak } from '../learn/speech'
+import { allowedTypos } from '../learn/answer-check'
 import { Mascot } from '../components/Mascot'
 import { Button, LevelRing } from '../components/ui'
 import './screens.css'
@@ -145,17 +146,24 @@ export function ProfileScreen({
             ))}
           </select>
         </label>
-        <div className="profile__row profile__row--inline">
-          <span>Tippfehler verzeihen</span>
-          <button
-            role="switch"
-            aria-checked={settings.typoTolerance}
-            className={`switch ${settings.typoTolerance ? 'switch--on' : ''}`}
-            onClick={() => set({ typoTolerance: !settings.typoTolerance })}
+        <label className="profile__row">
+          <span className="caption">Tippfehler verzeihen</span>
+          <select
+            className="profile__input"
+            value={settings.typoTolerancePercent}
+            onChange={(e) => set({ typoTolerancePercent: Number(e.target.value) })}
           >
-            <span className="switch__knob" />
-          </button>
-        </div>
+            <option value={0}>Aus (exakt schreiben)</option>
+            <option value={10}>10 % der Wortlänge</option>
+            <option value={20}>20 % der Wortlänge</option>
+            <option value={30}>30 % der Wortlänge</option>
+          </select>
+          <span className="caption">
+            {settings.typoTolerancePercent > 0
+              ? `Bei 10 Buchstaben ${allowedTypos(10, settings.typoTolerancePercent)} Fehler erlaubt, bei 5 Buchstaben ${allowedTypos(5, settings.typoTolerancePercent)}.`
+              : 'Jeder Buchstabe muss stimmen.'}
+          </span>
+        </label>
       </div>
 
       {canSpeak() && (

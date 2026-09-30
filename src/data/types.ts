@@ -85,7 +85,8 @@ export interface SettingsData {
   mascot: MascotId
   direction: Direction
   inputMode: InputMode
-  typoTolerance: boolean
+  /** Erlaubte Tippfehler in % der Wortlänge (0 = exakte Schreibweise) */
+  typoTolerancePercent: number
   autoAudio: boolean
   /** voiceURI der bevorzugten Englisch-Stimme; null = automatisch (GB bevorzugt) */
   voiceURI: string | null
@@ -112,7 +113,7 @@ export const DEFAULT_SETTINGS: SettingsData = {
   mascot: 'fox',
   direction: 'de-en',
   inputMode: 'choice',
-  typoTolerance: true,
+  typoTolerancePercent: 20,
   autoAudio: false,
   voiceURI: null,
   speechRate: 0.95,

@@ -244,7 +244,7 @@ export function SessionScreen({
           onSubmit={(e) => {
             e.preventDefault()
             if (phase === 'ask' && typed.trim()) {
-              answer(checkAnswer(solution, typed, settings.typoTolerance))
+              answer(checkAnswer(solution, typed, settings.typoTolerancePercent))
             }
           }}
         >

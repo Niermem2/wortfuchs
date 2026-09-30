@@ -113,8 +113,8 @@ export function VerbsScreen({
     if (!verb || phase !== 'ask' || graded.current || !past.trim() || !participle.trim()) return
     graded.current = true
     const correct =
-      checkAnswer(verb.past, past, settings.typoTolerance) &&
-      checkAnswer(verb.participle, participle, settings.typoTolerance)
+      checkAnswer(verb.past, past, settings.typoTolerancePercent) &&
+      checkAnswer(verb.participle, participle, settings.typoTolerancePercent)
     setLastCorrect(correct)
     setPhase('feedback')
     const firstTry = !wrongVerbs.has(verb.infinitive)
